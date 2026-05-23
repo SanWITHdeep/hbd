@@ -1,0 +1,2384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday — 24 Years of Magic</title>
+    <meta name="description" content="A cinematic, interactive, premium birthday experience to celebrate turning 24. Smooth scroll-driven stories, WebGL animations, and personal notes.">
+    
+    <!-- Premium Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cinzel+Decorative:wght@700&family=Inter:wght@300;400;500;600&family=La+Belle+Aurore&display=swap" rel="stylesheet">
+    
+    <!-- Libraries via CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+
+    <style>
+        /* CSS Reset & Design Tokens */
+        :root {
+            --bg-dark: #050505;
+            --bg-card: rgba(18, 18, 18, 0.7);
+            --gold: #d4af37;
+            --gold-glow: rgba(212, 175, 55, 0.35);
+            --rose-gold: #b76e79;
+            --rose-glow: rgba(183, 110, 121, 0.3);
+            --text-light: #f5f5f7;
+            --text-muted: #86868b;
+            --font-cinzel: 'Cinzel', serif;
+            --font-inter: 'Inter', sans-serif;
+            --font-cursive: 'La Belle Aurore', cursive;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        html, body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            font-family: var(--font-inter);
+            overflow-x: hidden;
+            width: 100%;
+        }
+
+        /* Lenis Recommended CSS */
+        html.lenis, html.lenis body {
+            height: auto;
+        }
+
+        .lenis.lenis-smooth {
+            scroll-behavior: auto !important;
+        }
+
+        .lenis.lenis-smooth [data-lenis-prevent] {
+            overscroll-behavior: contain;
+        }
+
+        .lenis.lenis-stopped {
+            overflow: hidden;
+        }
+
+        /* Continuous Ambient Starfield Background */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            will-change: transform;
+        }
+
+        /* Smooth scroll wrapper for Lenis */
+        #smooth-wrapper {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+        }
+
+        /* Glassmorphic Audio Controller */
+        .audio-control {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            width: 48px;
+            height: 48px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .audio-control.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .audio-control:hover {
+            transform: scale(1.08);
+            border-color: var(--gold);
+            box-shadow: 0 0 15px var(--gold-glow);
+        }
+
+        .audio-control svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--text-light);
+            transition: fill 0.3s;
+        }
+
+        .audio-control:hover svg {
+            fill: var(--gold);
+        }
+
+        /* Interaction Overlay (Safeguard for Autoplay) */
+        #entry-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-dark);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .overlay-content {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .overlay-title {
+            font-family: var(--font-cinzel);
+            font-size: 2rem;
+            letter-spacing: 0.3em;
+            margin-bottom: 40px;
+            background: linear-gradient(135deg, #ffffff 30%, var(--gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-enter {
+            background: transparent;
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            color: var(--text-light);
+            font-family: var(--font-cinzel);
+            font-size: 0.9rem;
+            letter-spacing: 0.2em;
+            padding: 15px 45px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            border-radius: 2px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-enter::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.2), transparent);
+            transition: all 0.6s;
+        }
+
+        .btn-enter:hover::before {
+            left: 100%;
+        }
+
+        .btn-enter:hover {
+            color: var(--gold);
+            border-color: var(--gold);
+            box-shadow: 0 0 25px var(--gold-glow);
+            transform: translateY(-2px);
+        }
+
+        /* Scroll Progress Bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--rose-gold), var(--gold));
+            z-index: 101;
+            box-shadow: 0 0 10px var(--gold-glow);
+        }
+
+        /* Generic Section Styling */
+        section {
+            min-height: 100vh;
+            width: 100%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* SECTION 1: INTRO */
+        #sec-intro {
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .intro-text-container {
+            text-align: center;
+            z-index: 5;
+            max-width: 90%;
+            pointer-events: none;
+        }
+
+        .intro-heading {
+            font-family: var(--font-cinzel);
+            font-size: clamp(2rem, 5vw, 4.5rem);
+            font-weight: 300;
+            line-height: 1.4;
+            letter-spacing: 0.1em;
+            background: linear-gradient(to right, #ffffff, var(--rose-gold), var(--gold), #ffffff);
+            background-size: 300% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: textShimmer 10s linear infinite;
+            text-shadow: 0 0 40px var(--rose-glow);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .highlight-24 {
+            font-family: 'Cinzel Decorative', var(--font-cinzel), serif;
+            font-weight: 700;
+            color: var(--gold);
+            text-shadow: 0 0 15px var(--gold-glow), 0 0 30px var(--gold-glow);
+            background: linear-gradient(135deg, #ffffff 0%, var(--gold) 50%, var(--rose-gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: goldPulse 3s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        @keyframes goldPulse {
+            0%, 100% {
+                text-shadow: 0 0 10px rgba(212, 175, 55, 0.4), 0 0 20px rgba(212, 175, 55, 0.2);
+                transform: scale(1.0);
+            }
+            50% {
+                text-shadow: 0 0 25px rgba(212, 175, 55, 0.8), 0 0 40px rgba(212, 175, 55, 0.4);
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes textShimmer {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .rose-placeholder {
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            opacity: 0;
+            z-index: 2;
+            pointer-events: none;
+            filter: blur(1px) drop-shadow(0 0 20px var(--rose-glow));
+            transform: translate(-50%, -50%) scale(0.8);
+            transform-origin: center;
+        }
+
+        /* Scroll indicator */
+        .scroll-hint {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            transition: opacity 1.5s 1s ease-in-out;
+        }
+
+        .scroll-hint.visible {
+            opacity: 0.7;
+        }
+
+        .scroll-hint span {
+            font-size: 0.75rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-family: var(--font-inter);
+        }
+
+        .scroll-mouse {
+            width: 22px;
+            height: 38px;
+            border: 1px solid var(--text-muted);
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .scroll-wheel {
+            width: 4px;
+            height: 8px;
+            background-color: var(--gold);
+            border-radius: 2px;
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: wheelScroll 1.8s ease-in-out infinite;
+        }
+
+        @keyframes wheelScroll {
+            0% { top: 8px; opacity: 1; }
+            50% { top: 18px; opacity: 0; }
+            100% { top: 8px; opacity: 0; }
+        }
+
+        /* SECTION 2: CAKE CUTTING (PINNED) */
+        #sec-cake {
+            background-color: transparent;
+        }
+
+        .cake-ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 80px 20px;
+            pointer-events: none;
+        }
+
+        .cake-title {
+            font-family: var(--font-cinzel);
+            font-weight: 300;
+            font-size: clamp(1.8rem, 4vw, 3.4rem);
+            letter-spacing: 0.25em;
+            color: var(--text-light);
+            text-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+            text-align: center;
+            opacity: 0;
+            transform: translateY(30px);
+            will-change: transform, opacity;
+        }
+
+        .hbd-title {
+            font-family: var(--font-cinzel);
+            font-size: clamp(2.5rem, 7vw, 6rem);
+            font-weight: 700;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            
+            /* Diamond-Gold metallic gradient */
+            background: linear-gradient(
+                135deg,
+                #d4af37 0%,   /* Gold */
+                #f3e5ab 25%,  /* Diamond Cream */
+                #ffffff 50%,  /* White Shine */
+                #f3e5ab 75%,  /* Diamond Cream */
+                #d4af37 100%  /* Gold */
+            );
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            
+            /* Layered 3D carved gold look */
+            text-shadow: 
+                1px 1px 0px #9e782f,
+                2px 2px 0px #866123,
+                3px 3px 0px #6e4c19,
+                4px 4px 12px rgba(0, 0, 0, 0.6),
+                0 0 20px rgba(212, 175, 55, 0.4),
+                0 0 40px rgba(212, 175, 55, 0.2);
+                
+            animation: metallicShine 6s linear infinite;
+            text-align: center;
+            opacity: 0;
+            transform: scale(0.9);
+            will-change: transform, opacity, filter;
+        }
+
+        @keyframes metallicShine {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 200% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .cake-instruction {
+            font-family: var(--font-inter);
+            font-size: 0.85rem;
+            letter-spacing: 0.25em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(-20px);
+            will-change: transform, opacity;
+        }
+
+        .cake-info-note {
+            font-family: var(--font-inter);
+            font-size: 0.72rem;
+            letter-spacing: 0.2em;
+            color: var(--gold);
+            text-transform: uppercase;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(-20px);
+            will-change: transform, opacity;
+            text-shadow: 0 0 10px var(--gold-glow);
+        }
+
+        #cake-webgl-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            cursor: grab;
+        }
+
+        #cake-webgl-container:active {
+            cursor: grabbing;
+        }
+
+        /* 2D Overlay Fireworks Canvas */
+        #fireworks-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 7;
+            pointer-events: none;
+            display: none;
+        }
+
+        /* SECTION 3: LETTER */
+        #sec-letter {
+            background-color: transparent;
+            min-height: 120vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 80px 20px;
+        }
+
+        .paper-note {
+            background-color: var(--bg-card);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 60px 40px;
+            width: 100%;
+            max-width: 680px;
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+            position: relative;
+            transform: translateY(60px);
+            opacity: 0;
+            will-change: transform, opacity;
+        }
+
+        /* Dual glowing saber edge borders */
+        .paper-note::before {
+            content: '';
+            position: absolute;
+            top: -1px; left: -1px; right: -1px; bottom: -1px;
+            border-radius: 12px;
+            background: linear-gradient(90deg, var(--gold), var(--rose-gold), var(--gold));
+            background-size: 200% 200%;
+            animation: saberFlow 4s linear infinite;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .paper-note::after {
+            content: '';
+            position: absolute;
+            top: -4px; left: -4px; right: -4px; bottom: -4px;
+            border-radius: 12px;
+            background: linear-gradient(90deg, var(--gold), var(--rose-gold), var(--gold));
+            background-size: 200% 200%;
+            animation: saberFlow 4s linear infinite;
+            filter: blur(10px);
+            opacity: 0.8;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        @keyframes saberFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .letter-content {
+            font-family: var(--font-cursive);
+            font-size: clamp(1.5rem, 2.5vw, 2.2rem);
+            line-height: 1.6;
+            color: var(--text-light);
+            text-shadow: 0 0 1px rgba(255, 255, 255, 0.2);
+            word-spacing: 0.1em;
+            letter-spacing: 0.03em;
+        }
+
+        .letter-content span.char {
+            opacity: 0.15;
+            transition: opacity 0.15s;
+            will-change: opacity;
+        }
+
+        .letter-content span.char.active {
+            opacity: 1;
+            color: var(--text-light);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .letter-signature-container {
+            margin-top: 40px;
+            text-align: right;
+            font-family: var(--font-cursive);
+            font-size: clamp(1.4rem, 2.5vw, 2.2rem);
+            color: var(--rose-gold);
+            opacity: 0.15;
+            transition: opacity 0.5s;
+        }
+
+        .letter-signature-container.active {
+            opacity: 1;
+            text-shadow: 0 0 10px var(--rose-glow);
+        }
+
+        /* SECTION 4: POLAROID GALLERY (PINNED) */
+        #sec-polaroid {
+            background-color: transparent;
+            overflow: visible !important;
+        }
+
+        #sec-cake {
+            overflow: visible !important;
+        }
+
+        #camera-webgl-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            cursor: grab;
+            overflow: visible !important;
+        }
+
+        #camera-webgl-container:active {
+            cursor: grabbing;
+        }
+
+        .camera-icon-wrapper {
+            margin-bottom: 15px;
+            opacity: 0;
+            transform: translateY(20px);
+            will-change: transform, opacity, filter;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--gold);
+            filter: drop-shadow(0 0 8px var(--gold-glow));
+        }
+
+        .camera-svg {
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .polaroid-ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 80px 20px;
+            pointer-events: none;
+        }
+
+        .polaroid-title {
+            font-family: var(--font-cinzel);
+            font-size: clamp(1.8rem, 4vw, 3.2rem);
+            letter-spacing: 0.15em;
+            color: #ffffff;
+            text-align: center;
+            text-shadow: 0 0 25px rgba(255, 255, 255, 0.25);
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .polaroid-instruction {
+            font-family: var(--font-inter);
+            font-size: 0.85rem;
+            letter-spacing: 0.25em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        /* Flash overlay effect on camera shutter */
+        #shutter-flash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* SECTION 5: ENDING / SIGNATURE */
+        #sec-ending {
+            flex-direction: column;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .ending-container {
+            text-align: center;
+            z-index: 5;
+            max-width: 90%;
+        }
+
+        .ending-text {
+            font-family: var(--font-cinzel);
+            font-size: clamp(1.8rem, 3.5vw, 3rem);
+            font-weight: 300;
+            letter-spacing: 0.2em;
+            margin-bottom: 20px;
+            opacity: 0;
+            transform: translateY(30px);
+            color: var(--text-light);
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .signature-svg {
+            width: 250px;
+            height: 100px;
+            opacity: 0;
+            transform: scale(0.9);
+            filter: drop-shadow(0 0 8px var(--rose-glow));
+        }
+
+        .signature-svg path {
+            fill: none;
+            stroke: var(--rose-gold);
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+        }
+
+        /* Responsive UI Scaling adjustments */
+        @media (max-width: 768px) {
+            .audio-control {
+                top: 20px;
+                right: 20px;
+                width: 42px;
+                height: 42px;
+            }
+            .paper-note {
+                padding: 40px 25px;
+            }
+            .letter-content {
+                line-height: 1.5;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Camera click flash element -->
+    <div id="shutter-flash"></div>
+
+    <!-- Scroll Progress Bar -->
+    <div class="progress-bar" id="top-progress"></div>
+
+    <!-- Entry Interaction Overlay -->
+    <div id="entry-overlay">
+        <div class="overlay-content">
+            <h2 class="overlay-title">A Journey Awaits</h2>
+            <button class="btn-enter" onclick="enterExperience()">Unlock Magic</button>
+        </div>
+    </div>
+
+    <!-- Persistent Ambient Background -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Glassmorphic Audio Toggle -->
+    <div class="audio-control" id="audio-btn" onclick="toggleAudio()">
+        <!-- Speaker Icon Muted (default) -->
+        <svg id="mute-icon" viewBox="0 0 24 24">
+            <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.21.05-.42.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+        </svg>
+        <!-- Speaker Icon Unmuted -->
+        <svg id="unmute-icon" viewBox="0 0 24 24" style="display: none;">
+            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+        </svg>
+    </div>
+
+    <!-- Lenis Scroll Wrapper -->
+    <div id="smooth-wrapper">
+
+        <!-- SECTION 1: INTRO -->
+        <section id="sec-intro">
+            <!-- Procedural decorative rose placeholder elements (svg layers floating) -->
+            <svg class="rose-placeholder" id="rose-left" viewBox="0 0 100 100">
+                <defs>
+                    <radialGradient id="rose-grad-1" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="#ff9a9e" stop-opacity="0.6" />
+                        <stop offset="60%" stop-color="#fecfef" stop-opacity="0.3" />
+                        <stop offset="100%" stop-color="#050505" stop-opacity="0" />
+                    </radialGradient>
+                </defs>
+                <!-- Stylized luxury rose silhouette shape -->
+                <circle cx="50" cy="50" r="45" fill="url(#rose-grad-1)" />
+                <path d="M50 30 C45 20, 35 25, 45 40 C35 45, 40 55, 50 50 C60 55, 65 45, 55 40 C65 25, 55 20, 50 30 Z" fill="#b76e79" opacity="0.4" />
+                <path d="M50 35 C48 30, 42 33, 47 42 C41 45, 44 51, 50 48 C56 51, 59 45, 53 42 C58 33, 52 30, 50 35 Z" fill="#9e5661" opacity="0.6" />
+                <path d="M50 40 A5 5 0 1 0 50.1 40" fill="none" stroke="#d4af37" stroke-width="1" opacity="0.7"/>
+            </svg>
+
+            <svg class="rose-placeholder" id="rose-right" viewBox="0 0 100 100">
+                <defs>
+                    <radialGradient id="rose-grad-2" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="#ffd1dc" stop-opacity="0.5" />
+                        <stop offset="70%" stop-color="#b76e79" stop-opacity="0.1" />
+                        <stop offset="100%" stop-color="#050505" stop-opacity="0" />
+                    </radialGradient>
+                </defs>
+                <circle cx="50" cy="50" r="45" fill="url(#rose-grad-2)" />
+                <path d="M50 30 C43 18, 30 22, 42 38 C30 45, 36 57, 50 50 C64 57, 70 45, 58 38 C70 22, 57 18, 50 30 Z" fill="#b76e79" opacity="0.3" />
+                <path d="M50 43 A7 7 0 1 1 50.1 43" fill="none" stroke="#d4af37" stroke-width="1.2" opacity="0.5"/>
+            </svg>
+
+            <div class="intro-text-container">
+                <h1 class="intro-heading" id="intro-heading">Hey, you are turning<br><span class="highlight-24">24</span> this year.</h1>
+            </div>
+
+            <div class="scroll-hint" id="intro-scroll-hint">
+                <span>Scroll Down</span>
+                <div class="scroll-mouse">
+                    <div class="scroll-wheel"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: CAKE CUTTING (PINNED) -->
+        <section id="sec-cake">
+            <div class="cake-ui-overlay">
+                <h2 class="cake-title" id="cake-title">The Celebration Begins</h2>
+                <h2 class="hbd-title" id="cake-hbd">Happy Birthday!</h2>
+                <div style="display:flex; flex-direction:column; align-items:center; gap:8px; pointer-events:none;">
+                    <p class="cake-instruction" id="cake-prompt">Scroll to cut the cake</p>
+                    <p class="cake-info-note" id="cake-info-note">Tip: Drag the cake to rotate in 3D</p>
+                </div>
+            </div>
+            <!-- Canvas overlay for 2D Particle Fireworks -->
+            <canvas id="fireworks-canvas"></canvas>
+            <div id="cake-webgl-container"></div>
+        </section>
+
+        <!-- SECTION 3: LETTER -->
+        <section id="sec-letter">
+            <!-- Standard handwritten letter - characters will be wrapped by JS -->
+            <div class="paper-note" id="paper-note">
+                <div class="letter-content" id="typewriter-text">
+                    Dearest friend,<br><br>
+                    Today is a celebration of the beautiful light you bring into the world. In the grand canvas of life, turning 24 is a milestone of discovery, passion, and infinite horizons.<br><br>
+                    Every step you have taken has brought you to this moment, surrounded by quiet wonders and hearts that care deeply for you. Let go of the yesterdays, embrace the magic of today, and write your own beautiful story.<br><br>
+                    As you scroll onwards, let these memories remind you of the laughter, the journeys, and the bonds that stand timeless.
+                </div>
+                <div class="letter-signature-container" id="letter-sig-prefix">
+                    With all my heart,
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: POLAROID GALLERY (PINNED) -->
+        <section id="sec-polaroid">
+            <div class="polaroid-ui-overlay">
+                <div class="camera-icon-wrapper" id="camera-icon-wrap">
+                    <svg class="camera-svg" viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                        <circle cx="12" cy="13" r="4"/>
+                        <line x1="19" y1="9" x2="19.01" y2="9"/>
+                    </svg>
+                </div>
+                <h2 class="polaroid-title" id="polaroid-title">Captured in Time</h2>
+                <p class="polaroid-instruction" id="polaroid-prompt">Scroll to eject memories</p>
+            </div>
+            <!-- 2D Polaroid CSS Fallback (hidden by default) -->
+            <div id="polaroid-2d-fallback" style="display: none; position: absolute; z-index: 6; width: 100%; height: 100%; overflow: hidden; justify-content: center; align-items: center; gap: 20px; padding: 20px; flex-wrap: wrap;">
+                <div class="polaroid-2d" style="width: 140px; height: 170px; background: #fff; padding: 10px 10px 30px 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); transform: rotate(-5deg); opacity: 0; display: flex; flex-direction: column;">
+                    <div style="flex:1; background: linear-gradient(135deg, #2b1055, #7597de);"></div>
+                    <div style="font-family:var(--font-cursive); font-size: 0.9rem; color:#333; text-align:center; margin-top: 10px;">Twilight</div>
+                </div>
+                <div class="polaroid-2d" style="width: 140px; height: 170px; background: #fff; padding: 10px 10px 30px 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); transform: rotate(8deg); opacity: 0; display: flex; flex-direction: column;">
+                    <div style="flex:1; background: linear-gradient(135deg, #f9d423, #ff4e50);"></div>
+                    <div style="font-family:var(--font-cursive); font-size: 0.9rem; color:#333; text-align:center; margin-top: 10px;">Sunset</div>
+                </div>
+                <div class="polaroid-2d" style="width: 140px; height: 170px; background: #fff; padding: 10px 10px 30px 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); transform: rotate(-8deg); opacity: 0; display: flex; flex-direction: column;">
+                    <div style="flex:1; background: linear-gradient(135deg, #11998e, #38ef7d);"></div>
+                    <div style="font-family:var(--font-cursive); font-size: 0.9rem; color:#333; text-align:center; margin-top: 10px;">Aurora</div>
+                </div>
+                <div class="polaroid-2d" style="width: 140px; height: 170px; background: #fff; padding: 10px 10px 30px 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); transform: rotate(3deg); opacity: 0; display: flex; flex-direction: column;">
+                    <div style="flex:1; background: linear-gradient(135deg, #ff9a9e, #fecfef);"></div>
+                    <div style="font-family:var(--font-cursive); font-size: 0.9rem; color:#333; text-align:center; margin-top: 10px;">Embrace</div>
+                </div>
+                <div class="polaroid-2d" style="width: 140px; height: 170px; background: #fff; padding: 10px 10px 30px 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); transform: rotate(-3deg); opacity: 0; display: flex; flex-direction: column;">
+                    <div style="flex:1; background: linear-gradient(135deg, #0f2027, #2c5364);"></div>
+                    <div style="font-family:var(--font-cursive); font-size: 0.9rem; color:#333; text-align:center; margin-top: 10px;">Cosmic</div>
+                </div>
+            </div>
+            <div id="camera-webgl-container"></div>
+        </section>
+
+        <!-- SECTION 5: ENDING / SIGNATURE -->
+        <section id="sec-ending">
+            <div class="ending-container">
+                <h2 class="ending-text" id="ending-msg-1">With Love,</h2>
+                <!-- Elegantly animated signature SVG -->
+                <svg class="signature-svg" id="ending-signature" viewBox="0 0 350 150">
+                    <!-- Calligraphic signature path representing custom handwriting for Sandy -->
+                    <path d="M 60,95 C 50,75 65,40 85,45 C 105,50 85,85 70,100 C 65,105 80,105 95,95 C 105,85 115,75 120,85 C 125,95 120,100 130,95 C 140,90 145,80 150,85 C 155,90 150,100 160,95 C 170,90 175,80 180,85 L 180,45 L 180,95 C 180,100 190,95 195,90 C 200,85 205,80 210,85 C 215,90 210,110 205,125 C 200,140 190,135 205,115 C 220,95 250,90 290,95" />
+                </svg>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- MAIN INTERACTIVE APP SCRIPT -->
+    <script>
+        // --- 1. GLOBAL VARIABLES & AUDIO GENERATOR ---
+        let experienceEntered = false;
+        let isAudioPlaying = false;
+        let bgAudioTrack = null;
+
+        // Custom synthesized mechanical camera click sound using Web Audio API
+        function playCameraClick() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // 1. Shutter Release Noise
+                const bufferSize = audioCtx.sampleRate * 0.08;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+                
+                const noiseNode = audioCtx.createBufferSource();
+                noiseNode.buffer = buffer;
+                
+                const bandpass = audioCtx.createBiquadFilter();
+                bandpass.type = 'bandpass';
+                bandpass.frequency.setValueAtTime(1200, audioCtx.currentTime);
+                bandpass.Q.setValueAtTime(3, audioCtx.currentTime);
+                
+                const noiseGain = audioCtx.createGain();
+                noiseGain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+                noiseGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.06);
+                
+                noiseNode.connect(bandpass);
+                bandpass.connect(noiseGain);
+                noiseGain.connect(audioCtx.destination);
+                
+                // 2. High-pitched mechanical snap (spring trigger)
+                const osc = audioCtx.createOscillator();
+                const oscGain = audioCtx.createGain();
+                
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(2000, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.03);
+                
+                oscGain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                oscGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
+                
+                osc.connect(oscGain);
+                oscGain.connect(audioCtx.destination);
+                
+                // Trigger synth nodes
+                noiseNode.start();
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.1);
+            } catch (err) {
+                console.warn('AudioContext synth not allowed yet or failed:', err);
+            }
+        }
+
+        // Setup background track
+        function initMusic() {
+            // Soft premium instrumental music from a stable, CORS-enabled host
+            bgAudioTrack = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3'); 
+            bgAudioTrack.loop = true;
+            bgAudioTrack.volume = 0.0; // Start muted, fade-in later
+        }
+
+        function playMusicWithFade() {
+            if (!bgAudioTrack || isAudioPlaying) return;
+            bgAudioTrack.play().then(() => {
+                isAudioPlaying = true;
+                updateAudioUI();
+                gsap.to(bgAudioTrack, { volume: 0.35, duration: 3.0, ease: "power1.inOut" });
+            }).catch(err => {
+                console.warn("Autoplay block or music failed to load:", err);
+            });
+        }
+
+        function toggleAudio() {
+            if (!bgAudioTrack) return;
+            
+            if (isAudioPlaying) {
+                gsap.to(bgAudioTrack, { 
+                    volume: 0, 
+                    duration: 0.8, 
+                    onComplete: () => {
+                        bgAudioTrack.pause();
+                        isAudioPlaying = false;
+                        updateAudioUI();
+                    } 
+                });
+            } else {
+                bgAudioTrack.play().then(() => {
+                    isAudioPlaying = true;
+                    updateAudioUI();
+                    gsap.to(bgAudioTrack, { volume: 0.35, duration: 1.0 });
+                }).catch(err => {
+                    console.warn("Audio play failed or was blocked by browser:", err);
+                });
+            }
+        }
+
+        function updateAudioUI() {
+            const btn = document.getElementById('audio-btn');
+            const mute = document.getElementById('mute-icon');
+            const unmute = document.getElementById('unmute-icon');
+            if (isAudioPlaying) {
+                mute.style.display = 'none';
+                unmute.style.display = 'block';
+                btn.style.borderColor = 'var(--gold)';
+            } else {
+                mute.style.display = 'block';
+                unmute.style.display = 'none';
+                btn.style.borderColor = 'rgba(255,255,255,0.1)';
+            }
+        }
+
+        function enterExperience() {
+            experienceEntered = true;
+            document.getElementById('entry-overlay').style.opacity = '0';
+            
+            // Initialize music objects after user click
+            initMusic();
+            
+            setTimeout(() => {
+                document.getElementById('entry-overlay').style.display = 'none';
+                document.getElementById('audio-btn').classList.add('visible');
+                
+                // Trigger intro visual sequences
+                gsap.to("#intro-heading", { opacity: 1, y: 0, duration: 2.2, ease: "power3.out" });
+                gsap.to("#rose-left", { opacity: 0.25, x: "10%", y: "-5%", scale: 1.1, duration: 4.0, ease: "power2.out", delay: 0.5 });
+                gsap.to("#rose-right", { opacity: 0.25, x: "-10%", y: "5%", scale: 1.1, duration: 4.5, ease: "power2.out", delay: 0.7 });
+                document.getElementById('intro-scroll-hint').classList.add('visible');
+            }, 1200);
+        }
+
+        // --- 2. SMOOTH SCROLLING (LENIS) & GSAP INTEGRATION ---
+        gsap.registerPlugin(ScrollTrigger);
+        let lenis;
+        
+        function initLenis() {
+            lenis = new Lenis({
+                duration: 1.4,
+                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                smoothWheel: true,
+                smoothTouch: false,
+                touchMultiplier: 1.5,
+                infinite: false
+            });
+
+            lenis.on('scroll', ScrollTrigger.update);
+
+            gsap.ticker.add((time) => {
+                lenis.raf(time * 1000);
+            });
+
+            gsap.ticker.lagSmoothing(0);
+        }
+        initLenis();
+
+        // Linked Top Scroll progress bar
+        gsap.to("#top-progress", {
+            width: "100%",
+            ease: "none",
+            scrollTrigger: {
+                trigger: "#smooth-wrapper",
+                start: "top top",
+                end: "bottom bottom",
+                scrub: true
+            }
+        });
+
+
+        // --- 3. AMBIENT BACKGROUND STARFIELD CANVAS ---
+        const bgCanvas = document.getElementById('bg-canvas');
+        const bgCtx = bgCanvas.getContext('2d');
+        let width = bgCanvas.width = window.innerWidth;
+        let height = bgCanvas.height = window.innerHeight;
+
+        let stars = [];
+        let lightOrbs = [];
+        let mouseX = 0, mouseY = 0;
+        let scrollYOffset = 0;
+
+        let trailParticles = [];
+        let pulseParticles = [];
+        let smokyOrbX = width / 2;
+        let smokyOrbY = height / 2;
+
+        class TrailParticle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 20 + 15;
+                this.alpha = 1.0;
+                this.decay = Math.random() * 0.02 + 0.015;
+                this.vx = (Math.random() - 0.5) * 0.4;
+                this.vy = (Math.random() - 0.5) * 0.4 - 0.2;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.alpha -= this.decay;
+                this.size += 0.5;
+            }
+            draw() {
+                if (this.alpha <= 0) return;
+                bgCtx.save();
+                bgCtx.globalCompositeOperation = 'screen';
+                const grad = bgCtx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
+                grad.addColorStop(0, `rgba(212, 175, 55, ${this.alpha * 0.15})`);
+                grad.addColorStop(0.5, `rgba(183, 110, 121, ${this.alpha * 0.05})`);
+                grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                bgCtx.fillStyle = grad;
+                bgCtx.beginPath();
+                bgCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                bgCtx.fill();
+                bgCtx.restore();
+            }
+        }
+
+        class PulseParticle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.radius = 5;
+                this.maxRadius = Math.random() * 60 + 50;
+                this.alpha = 1.0;
+                this.speed = Math.random() * 2 + 2;
+            }
+            update() {
+                this.radius += this.speed;
+                this.alpha = 1 - (this.radius / this.maxRadius);
+            }
+            draw() {
+                if (this.alpha <= 0) return;
+                bgCtx.save();
+                bgCtx.globalCompositeOperation = 'screen';
+                bgCtx.strokeStyle = `rgba(212, 175, 55, ${this.alpha * 0.6})`;
+                bgCtx.lineWidth = 2;
+                bgCtx.beginPath();
+                bgCtx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                bgCtx.stroke();
+                const grad = bgCtx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
+                grad.addColorStop(0, `rgba(183, 110, 121, ${this.alpha * 0.15})`);
+                grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                bgCtx.fillStyle = grad;
+                bgCtx.beginPath();
+                bgCtx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                bgCtx.fill();
+                bgCtx.restore();
+            }
+        }
+
+        class Star {
+            constructor() {
+                this.reset(true);
+            }
+            reset(init = false) {
+                this.x = Math.random() * width;
+                this.y = init ? Math.random() * height : -10;
+                this.size = Math.random() * 1.5 + 0.3;
+                this.speed = Math.random() * 0.12 + 0.03;
+                this.alpha = Math.random() * 0.7 + 0.3;
+                this.flickerSpeed = Math.random() * 0.015 + 0.005;
+                this.flickerDir = Math.random() > 0.5 ? 1 : -1;
+                this.parallaxFactor = Math.random() * 0.4 + 0.1;
+            }
+            update() {
+                // Drift downwards
+                this.y += this.speed;
+                
+                // Flicker alpha
+                this.alpha += this.flickerSpeed * this.flickerDir;
+                if (this.alpha >= 1) { this.alpha = 1; this.flickerDir = -1; }
+                if (this.alpha <= 0.1) { this.alpha = 0.1; this.flickerDir = 1; }
+
+                if (this.y > height) {
+                    this.reset(false);
+                }
+            }
+            draw() {
+                // Parallax scroll shift
+                const py = (this.y + (scrollYOffset * this.parallaxFactor)) % height;
+                const finalY = py < 0 ? py + height : py;
+                
+                // Mouse interactive repulsion (subtle)
+                const dx = mouseX - this.x;
+                const dy = mouseY - finalY;
+                const dist = Math.hypot(dx, dy);
+                let offsetX = 0, offsetY = 0;
+                if (dist < 120) {
+                    const force = (120 - dist) / 120;
+                    offsetX = -dx / dist * force * 15;
+                    offsetY = -dy / dist * force * 15;
+                }
+
+                bgCtx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
+                bgCtx.beginPath();
+                bgCtx.arc(this.x + offsetX, finalY + offsetY, this.size, 0, Math.PI * 2);
+                bgCtx.fill();
+            }
+        }
+
+        class LightOrb {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.radius = Math.random() * 200 + 100;
+                this.color = Math.random() > 0.5 ? '183, 110, 121' : '212, 175, 55'; // Rose gold or Gold
+                this.alpha = Math.random() * 0.04 + 0.01;
+                this.vx = (Math.random() - 0.5) * 0.2;
+                this.vy = (Math.random() - 0.5) * 0.2;
+                this.parallaxFactor = Math.random() * 0.15 + 0.05;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < -this.radius) this.x = width + this.radius;
+                if (this.x > width + this.radius) this.x = -this.radius;
+                if (this.y < -this.radius) this.y = height + this.radius;
+                if (this.y > height + this.radius) this.y = -this.radius;
+            }
+            draw() {
+                const py = (this.y + (scrollYOffset * this.parallaxFactor)) % height;
+                const finalY = py < 0 ? py + height : py;
+                
+                bgCtx.save();
+                bgCtx.globalCompositeOperation = 'screen';
+                const grad = bgCtx.createRadialGradient(this.x, finalY, 0, this.x, finalY, this.radius);
+                grad.addColorStop(0, `rgba(${this.color}, ${this.alpha})`);
+                grad.addColorStop(0.5, `rgba(${this.color}, ${this.alpha * 0.4})`);
+                grad.addColorStop(1.0, `rgba(${this.color}, 0)`);
+                bgCtx.fillStyle = grad;
+                bgCtx.beginPath();
+                bgCtx.arc(this.x, finalY, this.radius, 0, Math.PI * 2);
+                bgCtx.fill();
+                bgCtx.restore();
+            }
+        }
+
+        function initStars() {
+            stars = [];
+            lightOrbs = [];
+            const count = Math.min(180, Math.floor((width * height) / 8000));
+            for (let i = 0; i < count; i++) stars.push(new Star());
+            for (let i = 0; i < 4; i++) lightOrbs.push(new LightOrb());
+        }
+
+        function drawBackground() {
+            bgCtx.fillStyle = '#050505';
+            bgCtx.fillRect(0, 0, width, height);
+
+            // Draw floating light orbs (soft blurry ambient glow)
+            lightOrbs.forEach(orb => {
+                orb.update();
+                orb.draw();
+            });
+
+            // Draw starry space particles
+            stars.forEach(star => {
+                star.update();
+                star.draw();
+            });
+
+            // Update and draw lagging follower-orb
+            if (experienceEntered) {
+                smokyOrbX += (mouseX - smokyOrbX) * 0.12;
+                smokyOrbY += (mouseY - smokyOrbY) * 0.12;
+                
+                bgCtx.save();
+                bgCtx.globalCompositeOperation = 'screen';
+                const orbSize = 180;
+                const orbGrad = bgCtx.createRadialGradient(smokyOrbX, smokyOrbY, 0, smokyOrbX, smokyOrbY, orbSize);
+                orbGrad.addColorStop(0, 'rgba(212, 175, 55, 0.08)');
+                orbGrad.addColorStop(0.5, 'rgba(183, 110, 121, 0.03)');
+                orbGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                bgCtx.fillStyle = orbGrad;
+                bgCtx.beginPath();
+                bgCtx.arc(smokyOrbX, smokyOrbY, orbSize, 0, Math.PI * 2);
+                bgCtx.fill();
+                bgCtx.restore();
+            }
+
+            // Update and draw trail particles
+            for (let i = trailParticles.length - 1; i >= 0; i--) {
+                const p = trailParticles[i];
+                p.update();
+                if (p.alpha <= 0) {
+                    trailParticles.splice(i, 1);
+                } else {
+                    p.draw();
+                }
+            }
+
+            // Update and draw pulse particles
+            for (let i = pulseParticles.length - 1; i >= 0; i--) {
+                const p = pulseParticles[i];
+                p.update();
+                if (p.alpha <= 0) {
+                    pulseParticles.splice(i, 1);
+                } else {
+                    p.draw();
+                }
+            }
+
+            requestAnimationFrame(drawBackground);
+        }
+
+        window.addEventListener('resize', () => {
+            width = bgCanvas.width = window.innerWidth;
+            height = bgCanvas.height = window.innerHeight;
+            initStars();
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            if (experienceEntered && trailParticles.length < 150) {
+                trailParticles.push(new TrailParticle(mouseX, mouseY));
+            }
+        });
+
+        window.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 0) {
+                mouseX = e.touches[0].clientX;
+                mouseY = e.touches[0].clientY;
+                if (experienceEntered && trailParticles.length < 150) {
+                    trailParticles.push(new TrailParticle(mouseX, mouseY));
+                }
+            }
+        }, { passive: true });
+
+        const spawnPulse = (x, y) => {
+            if (!experienceEntered) return;
+            pulseParticles.push(new PulseParticle(x, y));
+            for (let i = 0; i < 8; i++) {
+                trailParticles.push(new TrailParticle(x + (Math.random() - 0.5) * 10, y + (Math.random() - 0.5) * 10));
+            }
+        };
+
+        window.addEventListener('mousedown', (e) => {
+            spawnPulse(e.clientX, e.clientY);
+        });
+
+        window.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 0) {
+                spawnPulse(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        }, { passive: true });
+
+        // Sync local offset scroll parameter with Lenis
+        lenis.on('scroll', (e) => {
+            scrollYOffset = -e.scroll;
+        });
+
+        initStars();
+        drawBackground();
+
+
+        // --- 4. SECTION 1: INTRO ANIMATIONS ---
+        // Custom parallax drifting for the rose shapes
+        gsap.to("#rose-left", {
+            yPercent: -20,
+            xPercent: 5,
+            rotation: 15,
+            ease: "none",
+            scrollTrigger: {
+                trigger: "#sec-intro",
+                start: "top top",
+                end: "bottom top",
+                scrub: 1
+            }
+        });
+        gsap.to("#rose-right", {
+            yPercent: 20,
+            xPercent: -5,
+            rotation: -10,
+            ease: "none",
+            scrollTrigger: {
+                trigger: "#sec-intro",
+                start: "top top",
+                end: "bottom top",
+                scrub: 1
+            }
+        });
+        // --- 5. SECTION 2: THREE.JS CAKE CUTTING ---
+        let cakeScene, cakeCamera, cakeRenderer, cakeGroup, flame, candleGlowLight, knifeGroup, fullSliceGroup;
+        let cakeMainTier, cakeSliceTier, topMainTier, topSliceTier;
+        let threeJsCakeLoaded = false;
+        let isCakeDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+        let cakeTargetRotationY = 0;
+        let cakeTargetRotationX = 0;
+
+        const cakeContainer = document.getElementById('cake-webgl-container');
+        if (cakeContainer) {
+            try {
+                // Scene setup
+                cakeScene = new THREE.Scene();
+                cakeScene.fog = new THREE.FogExp2(0x050505, 0.08);
+
+                const cakeWidth = cakeContainer.clientWidth > 0 ? cakeContainer.clientWidth : window.innerWidth;
+                const cakeHeight = cakeContainer.clientHeight > 0 ? cakeContainer.clientHeight : window.innerHeight;
+                const cakeAspect = cakeWidth / cakeHeight;
+
+                cakeCamera = new THREE.PerspectiveCamera(45, cakeAspect, 0.1, 100);
+                cakeCamera.position.set(0, 3.5, 7.5);
+                cakeCamera.lookAt(0, 1.2, 0);
+
+                cakeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                cakeRenderer.setSize(cakeWidth, cakeHeight);
+                cakeRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                cakeRenderer.shadowMap.enabled = true;
+                cakeRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                cakeContainer.appendChild(cakeRenderer.domElement);
+
+                // Mouse/Touch Drag Controls for Cake
+                function addCakeControls() {
+                    const dom = cakeRenderer.domElement;
+                    
+                    const onDown = (x, y) => {
+                        isCakeDragging = true;
+                        previousMousePosition = { x, y };
+                    };
+
+                    const onMove = (x, y) => {
+                        if (!isCakeDragging) return;
+                        const deltaX = x - previousMousePosition.x;
+                        const deltaY = y - previousMousePosition.y;
+                        
+                        cakeTargetRotationY += deltaX * 0.007;
+                        cakeTargetRotationX = Math.max(-0.4, Math.min(0.8, cakeTargetRotationX + deltaY * 0.007));
+                        
+                        previousMousePosition = { x, y };
+                    };
+
+                    const onUp = () => { isCakeDragging = false; };
+
+                    dom.addEventListener('mousedown', (e) => onDown(e.clientX, e.clientY));
+                    dom.addEventListener('mousemove', (e) => onMove(e.clientX, e.clientY));
+                    window.addEventListener('mouseup', onUp);
+
+                    dom.addEventListener('touchstart', (e) => {
+                        if (e.touches.length === 1) onDown(e.touches[0].clientX, e.touches[0].clientY);
+                    }, { passive: true });
+                    dom.addEventListener('touchmove', (e) => {
+                        if (e.touches.length === 1) onMove(e.touches[0].clientX, e.touches[0].clientY);
+                    }, { passive: true });
+                    window.addEventListener('touchend', onUp);
+                }
+                addCakeControls();
+
+                // Ambient Lights
+                const cakeAmbient = new THREE.AmbientLight(0xffffff, 0.4);
+                cakeScene.add(cakeAmbient);
+
+                // Directional soft spotlight casting shadows
+                const cakeLight = new THREE.SpotLight(0xffffff, 1.5);
+                cakeLight.position.set(5, 8, 5);
+                cakeLight.castShadow = true;
+                cakeLight.shadow.mapSize.width = 1024;
+                cakeLight.shadow.mapSize.height = 1024;
+                cakeLight.shadow.bias = -0.001;
+                cakeScene.add(cakeLight);
+
+                // Point Light inside flame representing candle flame glow
+                candleGlowLight = new THREE.PointLight(0xff9900, 0, 8);
+                candleGlowLight.position.set(0, 3.4, 0);
+                cakeScene.add(candleGlowLight);
+
+                // Procedural Cake Sponge Texture Generation (renders cut side)
+                function createSpongeTexture() {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 256;
+                    canvas.height = 256;
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Base sponge cake brown
+                    ctx.fillStyle = '#6d4c41';
+                    ctx.fillRect(0, 0, 256, 256);
+                    
+                    // Cream layers (white lines)
+                    ctx.fillStyle = '#fff8e7';
+                    ctx.fillRect(0, 60, 256, 20);
+                    ctx.fillRect(0, 130, 256, 20);
+                    ctx.fillRect(0, 200, 256, 20);
+                    
+                    // Sponge texture dots
+                    ctx.fillStyle = '#4e342e';
+                    for (let i = 0; i < 500; i++) {
+                        const rx = Math.random() * 256;
+                        const ry = Math.random() * 256;
+                        if ((ry < 60 || ry > 80) && (ry < 130 || ry > 150) && (ry < 200 || ry > 220)) {
+                            ctx.fillRect(rx, ry, 2, 2);
+                        }
+                    }
+                    
+                    const tex = new THREE.CanvasTexture(canvas);
+                    tex.wrapS = THREE.RepeatWrapping;
+                    tex.wrapT = THREE.RepeatWrapping;
+                    return tex;
+                }
+
+                const spongeTex = createSpongeTexture();
+
+                // Create Materials
+                const frostingMat = new THREE.MeshStandardMaterial({ color: 0xffd1dc, roughness: 0.25, metalness: 0.02 }); // Pastel Pink Outer Frosting
+                const spongeMat = new THREE.MeshStandardMaterial({ map: spongeTex, roughness: 0.8, side: THREE.DoubleSide }); // Inside Sliced Layer
+                const topFrostingMat = new THREE.MeshStandardMaterial({ color: 0xffeef2, roughness: 0.3 }); // White Whipped Cream top
+
+                // Main Cake Group
+                cakeGroup = new THREE.Group();
+                cakeScene.add(cakeGroup);
+
+                // We construct the Cake in two segments: the large cut portion (330 degrees) and the slideable slice (30 degrees)
+                const sliceAngle = Math.PI * 2 * (30/360);
+                const mainAngle = Math.PI * 2 * (330/360);
+
+                // Helper to construct cake segment (Outer layer, top, bottom, and flat sliced edges)
+                function createCakeSegment(radius, height, startAng, lengthAng) {
+                    const segmentGroup = new THREE.Group();
+
+                    // Cylinder shell piece (including top/bottom caps via openEnded = false)
+                    const cylinderGeom = new THREE.CylinderGeometry(radius, radius, height, 40, 1, false, startAng, lengthAng);
+                    const segmentMesh = new THREE.Mesh(cylinderGeom, [frostingMat, topFrostingMat, frostingMat]);
+                    segmentMesh.castShadow = true;
+                    segmentMesh.receiveShadow = true;
+                    segmentGroup.add(segmentMesh);
+
+                    // Flat side cut walls (solid inner sponge cake)
+                    // Wall 1: along startAng
+                    const wallGeom1 = new THREE.PlaneGeometry(radius, height);
+                    wallGeom1.translate(radius / 2, 0, 0); // shift so pivot is at center edge (0,0)
+                    const wall1 = new THREE.Mesh(wallGeom1, spongeMat);
+                    wall1.rotation.y = startAng - Math.PI / 2; // Rotate to start angle
+                    wall1.castShadow = true;
+                    segmentGroup.add(wall1);
+
+                    // Wall 2: along startAng + lengthAng
+                    const wallGeom2 = new THREE.PlaneGeometry(radius, height);
+                    wallGeom2.translate(radius / 2, 0, 0); // shift so pivot is at center edge (0,0)
+                    const wall2 = new THREE.Mesh(wallGeom2, spongeMat);
+                    wall2.rotation.y = (startAng + lengthAng) - Math.PI / 2; // Rotate to end angle
+                    wall2.castShadow = true;
+                    segmentGroup.add(wall2);
+
+                    return segmentGroup;
+                }
+
+                // Build the physical elements
+                cakeMainTier = createCakeSegment(2.0, 1.2, sliceAngle, mainAngle);
+                cakeMainTier.position.y = 0.6;
+                cakeGroup.add(cakeMainTier);
+
+                cakeSliceTier = createCakeSegment(2.0, 1.2, 0, sliceAngle);
+                cakeSliceTier.position.y = 0.6;
+                cakeGroup.add(cakeSliceTier);
+
+                // Double Tier Top (Add second level cake for a luxury wedding/tiered look)
+                topMainTier = createCakeSegment(1.4, 0.9, sliceAngle, mainAngle);
+                topMainTier.position.y = 1.65;
+                cakeGroup.add(topMainTier);
+
+                topSliceTier = createCakeSegment(1.4, 0.9, 0, sliceAngle);
+                topSliceTier.position.y = 1.65;
+                cakeGroup.add(topSliceTier);
+
+                // Assemble separate subgroups to allow clean sliding out of the slice
+                fullSliceGroup = new THREE.Group();
+                fullSliceGroup.add(cakeSliceTier);
+                fullSliceGroup.add(topSliceTier);
+                cakeGroup.add(fullSliceGroup);
+
+                // Frosting details (Piping spheres around edges)
+                const pipeGeom = new THREE.SphereGeometry(0.08, 8, 8);
+                const pipeMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 });
+                
+                // Loop to add spheres in a ring
+                const mainPiping = new THREE.Group();
+                const slicePiping = new THREE.Group();
+                cakeGroup.add(mainPiping);
+                fullSliceGroup.add(slicePiping);
+
+                for (let i = 0; i < 36; i++) {
+                    const rad = Math.PI * 2 * (i/36);
+                    const p = new THREE.Mesh(pipeGeom, pipeMat);
+                    p.position.set(1.9 * Math.cos(rad), 1.22, 1.9 * Math.sin(rad));
+                    if (rad > 0 && rad < sliceAngle) {
+                        slicePiping.add(p);
+                    } else {
+                        mainPiping.add(p);
+                    }
+                }
+
+                // Candle cylinder
+                const candleGeom = new THREE.CylinderGeometry(0.06, 0.06, 0.7, 16);
+                const candleMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.3, metalness: 0.4 });
+                const candle = new THREE.Mesh(candleGeom, candleMat);
+                candle.position.set(0, 2.45, 0); // Position on top tier
+                cakeGroup.add(candle);
+
+                // Candle flame mesh (stylized tear drop shape)
+                const flameShape = new THREE.Shape();
+                flameShape.moveTo(0, 0);
+                flameShape.quadraticCurveTo(0.12, 0.15, 0.08, 0.35);
+                flameShape.quadraticCurveTo(0, 0.6, -0.08, 0.35);
+                flameShape.quadraticCurveTo(-0.12, 0.15, 0, 0);
+                
+                const flameGeom = new THREE.ExtrudeGeometry(flameShape, { depth: 0.02, bevelEnabled: true, bevelThickness: 0.02, bevelSize: 0.02, bevelSegments: 3, curveSegments: 12 });
+                const flameMat = new THREE.MeshBasicMaterial({ color: 0xff7700, transparent: true, opacity: 0.95 });
+                flame = new THREE.Mesh(flameGeom, flameMat);
+                flame.position.set(0, 2.8, 0);
+                cakeGroup.add(flame);
+
+                // Realistic chef's knife mesh (aligned horizontally along X, cutting edge facing down)
+                knifeGroup = new THREE.Group();
+                
+                // Blade: custom 3D shape representing curved chef's knife blade
+                const bladeShape = new THREE.Shape();
+                bladeShape.moveTo(0, -0.15); // Start at bottom bolster
+                bladeShape.lineTo(1.8, -0.15); // Straight cutting edge
+                bladeShape.quadraticCurveTo(2.1, -0.12, 2.25, 0.15); // Tip curve
+                bladeShape.lineTo(0, 0.15); // Top spine
+                bladeShape.lineTo(0, -0.15);
+
+                const bladeGeom = new THREE.ExtrudeGeometry(bladeShape, { 
+                    depth: 0.02, 
+                    bevelEnabled: true, 
+                    bevelThickness: 0.01, 
+                    bevelSize: 0.005, 
+                    bevelSegments: 3, 
+                    curveSegments: 12 
+                });
+                
+                // Metal blade material (highly metallic, low roughness)
+                const bladeMat = new THREE.MeshStandardMaterial({ 
+                    color: 0xdddddd, 
+                    metalness: 0.95, 
+                    roughness: 0.05 
+                });
+                const blade = new THREE.Mesh(bladeGeom, bladeMat);
+                blade.castShadow = true;
+                knifeGroup.add(blade);
+                
+                // Handle: extends from blade (x < 0)
+                const handleGeom = new THREE.CylinderGeometry(0.05, 0.05, 0.8, 12);
+                const handleMat = new THREE.MeshStandardMaterial({ 
+                    color: 0x3d2314, // Wooden brown handle (walnut wood look)
+                    roughness: 0.7 
+                });
+                const handle = new THREE.Mesh(handleGeom, handleMat);
+                handle.rotation.z = Math.PI / 2; // Lie along X axis
+                handle.position.set(-0.4, 0, 0); // Shift handle left of bolster pivot
+                handle.castShadow = true;
+                knifeGroup.add(handle);
+
+                knifeGroup.position.set(1.5, 3.8, 0); // High above relative to cakeGroup
+                knifeGroup.rotation.z = -Math.PI / 6; // Angled down
+                cakeGroup.add(knifeGroup); // Add to cakeGroup so it rotates with cake interaction!
+                
+                threeJsCakeLoaded = true;
+            } catch (err) {
+                console.warn("Three.js Cake setup failed, using 2D fallback:", err);
+                cakeContainer.innerHTML = `<div style="display:flex; flex-direction:column; justify-content:center; align-items:center; height:100%; font-family:var(--font-cinzel); font-size:2rem; color:var(--gold); text-shadow:0 0 10px var(--gold-glow); text-align:center;">🎂<br>Happy Birthday!</div>`;
+            }
+        }
+
+        // Utility to convert color string (e.g. #d4af37) to numeric hex
+        function varRGBToHex(hexStr) {
+            return parseInt(hexStr.replace('#', '0x'), 16);
+        }
+
+        // --- 2D CANVAS FIREWORKS SYSTEM ---
+        const fwCanvas = document.getElementById('fireworks-canvas');
+        const fwCtx = fwCanvas.getContext('2d');
+        fwCanvas.width = window.innerWidth;
+        fwCanvas.height = window.innerHeight;
+        let fwParticles = [];
+
+        class FireworksParticle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.angle = Math.random() * Math.PI * 2;
+                this.speed = Math.random() * 4 + 2;
+                this.gravity = 0.06;
+                this.alpha = 1.0;
+                this.decay = Math.random() * 0.015 + 0.01;
+                this.size = Math.random() * 2 + 1;
+                this.vx = Math.cos(this.angle) * this.speed;
+                this.vy = Math.sin(this.angle) * this.speed;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += this.gravity;
+                this.alpha -= this.decay;
+            }
+            draw() {
+                fwCtx.save();
+                fwCtx.globalAlpha = this.alpha;
+                fwCtx.fillStyle = this.color;
+                fwCtx.beginPath();
+                fwCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                fwCtx.fill();
+                fwCtx.restore();
+            }
+        }
+
+        function trigger2DFireworks() {
+            fwCanvas.style.display = 'block';
+            const colors = ['#d4af37', '#b76e79', '#ffffff', '#ffd1dc', '#ff5252'];
+            
+            // Loop interval to spawn multiple fireworks bursts
+            const interval = setInterval(() => {
+                if (scrollYOffset > -height * 0.5) { // Stop if user scrolled away
+                    clearInterval(interval);
+                    return;
+                }
+                const originX = Math.random() * fwCanvas.width;
+                const originY = Math.random() * (fwCanvas.height * 0.5) + (fwCanvas.height * 0.15);
+                const col = colors[Math.floor(Math.random() * colors.length)];
+                
+                for (let i = 0; i < 60; i++) {
+                    fwParticles.push(new FireworksParticle(originX, originY, col));
+                }
+            }, 800);
+            
+            // Spawn initial big burst immediately
+            for (let i = 0; i < 100; i++) {
+                fwParticles.push(new FireworksParticle(fwCanvas.width * 0.5, fwCanvas.height * 0.4, '#d4af37'));
+                fwParticles.push(new FireworksParticle(fwCanvas.width * 0.5, fwCanvas.height * 0.4, '#b76e79'));
+            }
+        }
+
+        function updateFireworks() {
+            if (fwCanvas.style.display === 'none') return;
+            fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
+            
+            for (let i = fwParticles.length - 1; i >= 0; i--) {
+                const p = fwParticles[i];
+                p.update();
+                if (p.alpha <= 0) {
+                    fwParticles.splice(i, 1);
+                } else {
+                    p.draw();
+                }
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            fwCanvas.width = window.innerWidth;
+            fwCanvas.height = window.innerHeight;
+        });
+
+        // GSAP ScrollTrigger timeline to orchestrate the cake scene
+        if (threeJsCakeLoaded) {
+            const cakeTimeline = gsap.timeline({
+                scrollTrigger: {
+                    trigger: "#sec-cake",
+                    start: "top top",
+                    end: "+=150%", // Pinned scroll duration
+                    pin: true,
+                    scrub: 1.0,
+                    onUpdate: (self) => {
+                        if (flame) {
+                            // Turn on/off flame light glow based on cut completion
+                            if (self.progress > 0.45) {
+                                // Extinguish flame visually
+                                flame.scale.set(0.001, 0.001, 0.001);
+                                candleGlowLight.intensity = 0;
+                            } else {
+                                flame.scale.set(1, 1, 1);
+                                candleGlowLight.intensity = 1.5;
+                            }
+                        }
+                    },
+                    onLeave: () => {
+                        // Trigger sound & celebration once cut is completed
+                        playMusicWithFade();
+                        trigger2DFireworks();
+                    }
+                }
+            });
+
+            // Stage 1: Move knife from starting point down through cake center
+            cakeTimeline.to(knifeGroup.position, { x: 0, y: 0.6, z: 0, duration: 1.5, ease: "power1.inOut" })
+                        .to(knifeGroup.rotation, { z: 0, duration: 1.0, ease: "power1.inOut" }, "<")
+                        
+                        // Show instruction elements fade in
+                        .to("#cake-title", { opacity: 1, y: 0, duration: 0.8 }, "<")
+                        .to("#cake-prompt", { opacity: 0.8, y: 0, duration: 0.8 }, "<")
+                        .to("#cake-info-note", { opacity: 0.8, y: 0, duration: 0.8 }, "<")
+                        
+                        // Stage 2: Slicing - Move slice outward radially along slice center (angle Math.PI/12 or 15 degrees)
+                        .to(fullSliceGroup.position, {
+                            x: 0.5 * Math.cos(Math.PI / 12),
+                            z: 0.5 * Math.sin(Math.PI / 12),
+                            duration: 1.5,
+                            ease: "power2.out"
+                        })
+                        
+                        // Stage 3: Knife retraction & lift away
+                        .to(knifeGroup.position, { x: -3.0, y: 4.5, z: -1.0, duration: 1.0, ease: "power2.in" })
+                        .to(knifeGroup.rotation, { z: -Math.PI / 3, duration: 1.0, ease: "power2.in" }, "<")
+                        
+                        // Stage 4: HBD Title display & celebration glow fading in
+                        .to("#cake-hbd", { opacity: 1, scale: 1.0, duration: 1.5, ease: "back.out(1.7)" })
+                        .to("#cake-title", { opacity: 0, y: -20, duration: 0.8 }, "<")
+                        .to("#cake-prompt", { opacity: 0, y: -20, duration: 0.8 }, "<")
+                        .to("#cake-info-note", { opacity: 0, y: -20, duration: 0.8 }, "<")
+                        .to("#cake-webgl-container", { filter: "blur(8px) brightness(0.45)", opacity: 0.4, duration: 1.5 }, "<");
+        } else {
+            // WebGL Fallback - fade in the title, then show "Happy Birthday!"
+            gsap.timeline({
+                scrollTrigger: {
+                    trigger: "#sec-cake",
+                    start: "top top",
+                    end: "+=120%", // Pin scroll duration for consistency
+                    pin: true,
+                    scrub: 1.0,
+                    onLeave: () => {
+                        playMusicWithFade();
+                        trigger2DFireworks();
+                    }
+                }
+            })
+            .to("#cake-title", { opacity: 1, y: 0, duration: 0.8 })
+            .to("#cake-prompt", { opacity: 0.8, y: 0, duration: 0.8 }, "<")
+            .to("#cake-info-note", { opacity: 0.8, y: 0, duration: 0.8 }, "<")
+            .to("#cake-hbd", { opacity: 1, scale: 1.0, duration: 1.2, ease: "back.out(1.7)" })
+            .to("#cake-title", { opacity: 0, y: -20, duration: 0.8 }, "<")
+            .to("#cake-prompt", { opacity: 0, y: -20, duration: 0.8 }, "<")
+            .to("#cake-info-note", { opacity: 0, y: -20, duration: 0.8 }, "<")
+            .to("#cake-webgl-container", { filter: "blur(5px)", opacity: 0.4, duration: 1.2 }, "<");
+        }
+
+
+        // --- 6. SECTION 3: LETTER SCROLL TYPEWRITER ---
+        const letterTextEl = document.getElementById('typewriter-text');
+        const textContentStr = letterTextEl.innerHTML.trim();
+        
+        // Clear element and wrap each character in a separate span for GSAP control
+        letterTextEl.innerHTML = '';
+        const chars = [];
+        
+        // Parser to handle HTML break tags (<br>) correctly
+        let currentPos = 0;
+        while (currentPos < textContentStr.length) {
+            if (textContentStr.substr(currentPos, 4) === '<br>') {
+                const br = document.createElement('br');
+                letterTextEl.appendChild(br);
+                currentPos += 4;
+            } else {
+                const span = document.createElement('span');
+                span.className = 'char';
+                span.textContent = textContentStr[currentPos];
+                letterTextEl.appendChild(span);
+                chars.push(span);
+                currentPos++;
+            }
+        }
+
+        // GSAP ScrollTrigger to type out characters character-by-character on scroll
+        const letterTl = gsap.timeline({
+            scrollTrigger: {
+                trigger: "#sec-letter",
+                start: "top 70%",
+                end: "bottom 80%",
+                scrub: 0.5,
+                onUpdate: (self) => {
+                    // Activate characters proportionally with scroll state
+                    const total = chars.length;
+                    const activeCount = Math.floor(self.progress * total);
+                    chars.forEach((c, idx) => {
+                        if (idx < activeCount) {
+                            c.classList.add('active');
+                        } else {
+                            c.classList.remove('active');
+                        }
+                    });
+                    
+                    // Reveal signature prefix when near complete
+                    if (self.progress > 0.9) {
+                        document.getElementById('letter-sig-prefix').classList.add('active');
+                    } else {
+                        document.getElementById('letter-sig-prefix').classList.remove('active');
+                    }
+                }
+            }
+        });
+
+        // Smoothly fade in the paper card envelope base
+        gsap.to("#paper-note", {
+            opacity: 1,
+            y: 0,
+            duration: 1.5,
+            scrollTrigger: {
+                trigger: "#sec-letter",
+                start: "top 80%",
+                end: "top 40%",
+                scrub: 1.0
+            }
+        });
+
+
+        // --- 7. SECTION 4: THREE.JS POLAROID GALLERY ---
+        let cameraScene, cameraCam, cameraRenderer, polaroidCameraGroup, photoSceneGroup, cameraFlashLight;
+        let threeJsCameraLoaded = false;
+        const polaroids = [];
+        const polaroidLabels = ["Midnight Twilight", "Golden Hour", "Emerald Dreams", "Warm Embrace", "Cosmic Horizons"];
+        const placeholderImages = ["pic1.jpg", "pic2.jpg", "pic3.jpg", "pic4.jpg", "pic5.jpg"];
+        let isCamDragging = false;
+        let previousCamMousePos = { x: 0, y: 0 };
+        let camTargetRotY = 0;
+        let camTargetRotX = 0;
+
+        const cameraContainer = document.getElementById('camera-webgl-container');
+        if (cameraContainer) {
+            try {
+                // Scene Setup
+                cameraScene = new THREE.Scene();
+                cameraScene.fog = new THREE.FogExp2(0x050505, 0.08);
+
+                const camWidth = cameraContainer.clientWidth > 0 ? cameraContainer.clientWidth : window.innerWidth;
+                const camHeight = cameraContainer.clientHeight > 0 ? cameraContainer.clientHeight : window.innerHeight;
+                const camAspect = camWidth / camHeight;
+
+                cameraCam = new THREE.PerspectiveCamera(40, camAspect, 0.1, 100);
+                cameraCam.position.set(0, 4.0, 7.5);
+                cameraCam.lookAt(0, 0.5, 0);
+
+                cameraRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                cameraRenderer.setSize(camWidth, camHeight);
+                cameraRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                cameraRenderer.shadowMap.enabled = true;
+                cameraRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                cameraContainer.appendChild(cameraRenderer.domElement);
+
+                // Interactive mouse rotation controls for Camera scene
+                function addCameraControls() {
+                    const dom = cameraRenderer.domElement;
+                    
+                    const onDown = (x, y) => {
+                        isCamDragging = true;
+                        previousCamMousePos = { x, y };
+                    };
+
+                    const onMove = (x, y) => {
+                        if (!isCamDragging) return;
+                        const dx = x - previousCamMousePos.x;
+                        const dy = y - previousCamMousePos.y;
+                        
+                        camTargetRotY += dx * 0.007;
+                        camTargetRotX = Math.max(-0.2, Math.min(0.6, camTargetRotX + dy * 0.007));
+                        
+                        previousCamMousePos = { x, y };
+                    };
+
+                    const onUp = () => { isCamDragging = false; };
+
+                    dom.addEventListener('mousedown', (e) => onDown(e.clientX, e.clientY));
+                    dom.addEventListener('mousemove', (e) => onMove(e.clientX, e.clientY));
+                    window.addEventListener('mouseup', onUp);
+
+                    dom.addEventListener('touchstart', (e) => {
+                        if (e.touches.length === 1) onDown(e.touches[0].clientX, e.touches[0].clientY);
+                    }, { passive: true });
+                    dom.addEventListener('touchmove', (e) => {
+                        if (e.touches.length === 1) onMove(e.touches[0].clientX, e.touches[0].clientY);
+                    }, { passive: true });
+                    window.addEventListener('touchend', onUp);
+                }
+                addCameraControls();
+
+                // Lighting
+                const cameraAmbient = new THREE.AmbientLight(0xffffff, 0.45);
+                cameraScene.add(cameraAmbient);
+
+                const cameraSpotLight = new THREE.SpotLight(0xffffff, 1.8);
+                cameraSpotLight.position.set(6, 10, 5);
+                cameraSpotLight.castShadow = true;
+                cameraSpotLight.shadow.mapSize.width = 1024;
+                cameraSpotLight.shadow.mapSize.height = 1024;
+                cameraSpotLight.shadow.bias = -0.001;
+                cameraScene.add(cameraSpotLight);
+
+                // Flash Light Helper (Spike intensity when shutter triggers)
+                cameraFlashLight = new THREE.PointLight(0xffffff, 0, 15);
+                cameraFlashLight.position.set(0, 1.2, 1.5);
+                cameraScene.add(cameraFlashLight);
+
+                // Table Mesh (Wooden plane camera sits on)
+                const tableGeom = new THREE.PlaneGeometry(25, 25);
+                const tableMat = new THREE.MeshStandardMaterial({ color: 0x1a1512, roughness: 0.85 }); // Warm dark walnut wood grain tone
+                const table = new THREE.Mesh(tableGeom, tableMat);
+                table.rotation.x = -Math.PI / 2;
+                table.position.y = -0.6;
+                table.receiveShadow = true;
+                cameraScene.add(table);
+
+                // Camera Body Group
+                polaroidCameraGroup = new THREE.Group();
+                polaroidCameraGroup.position.set(0, 0.3, 0);
+                cameraScene.add(polaroidCameraGroup);
+
+                // Procedural 3D Polaroid Land Camera Body Build
+                const camBodyGeom = new THREE.BoxGeometry(2.2, 1.6, 1.3);
+                const camBodyMat = new THREE.MeshStandardMaterial({ color: 0x1f1f24, roughness: 0.6 });
+                const camBody = new THREE.Mesh(camBodyGeom, camBodyMat);
+                camBody.castShadow = true;
+                camBody.receiveShadow = true;
+                polaroidCameraGroup.add(camBody);
+
+                // Front Face Ring Panel
+                const frontFaceGeom = new THREE.BoxGeometry(2.0, 1.4, 0.15);
+                const frontFaceMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.7 });
+                const frontFace = new THREE.Mesh(frontFaceGeom, frontFaceMat);
+                frontFace.position.set(0, 0, 0.65);
+                polaroidCameraGroup.add(frontFace);
+
+                // Cylinder lens
+                const lensGeom = new THREE.CylinderGeometry(0.48, 0.48, 0.5, 32);
+                const lensMat = new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 0.1, metalness: 0.9 });
+                const lens = new THREE.Mesh(lensGeom, lensMat);
+                lens.rotation.x = Math.PI / 2;
+                lens.position.set(0, 0, 1.0);
+                lens.castShadow = true;
+                polaroidCameraGroup.add(lens);
+
+                const lensGlassGeom = new THREE.CylinderGeometry(0.38, 0.38, 0.05, 32);
+                const lensGlassMat = new THREE.MeshStandardMaterial({ color: 0x0e2430, roughness: 0.01, metalness: 0.95 }); // Reflective blue glass sheen
+                const lensGlass = new THREE.Mesh(lensGlassGeom, lensGlassMat);
+                lensGlass.rotation.x = Math.PI / 2;
+                lensGlass.position.set(0, 0, 1.25);
+                polaroidCameraGroup.add(lensGlass);
+
+                // Viewfinder casing
+                const finderGeom = new THREE.BoxGeometry(0.35, 0.35, 0.6);
+                const finder = new THREE.Mesh(finderGeom, camBodyMat);
+                finder.position.set(-0.7, 0.95, 0.15);
+                finder.castShadow = true;
+                polaroidCameraGroup.add(finder);
+
+                // Vintage design Rainbow colored highlight strip down camera center
+                const rainbowStripGeom = new THREE.BoxGeometry(0.12, 1.4, 0.01);
+                const rainbowStripMat = new THREE.MeshStandardMaterial({ color: 0xb76e79, roughness: 0.5 }); // Rose gold accent strip
+                const rainbowStrip = new THREE.Mesh(rainbowStripGeom, rainbowStripMat);
+                rainbowStrip.position.set(0.7, 0, 0.73);
+                polaroidCameraGroup.add(rainbowStrip);
+
+                // Silver shutter button
+                const shutterGeom = new THREE.CylinderGeometry(0.08, 0.08, 0.12, 12);
+                const shutterMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.9, roughness: 0.2 }); // Gold accent button
+                const shutter = new THREE.Mesh(shutterGeom, shutterMat);
+                shutter.position.set(0.7, 0.85, 0.4);
+                shutter.castShadow = true;
+                polaroidCameraGroup.add(shutter);
+
+                // Photo eject slot (long black slit in bottom front plate)
+                const slotGeom = new THREE.BoxGeometry(1.6, 0.04, 0.15);
+                const slotMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+                const slot = new THREE.Mesh(slotGeom, slotMat);
+                slot.position.set(0, -0.65, 0.7);
+                polaroidCameraGroup.add(slot);
+
+                // --- PROCEDURAL GENERATOR FOR POLAROID PHOTO MESHES ---
+                function generateProceduralMemoryTexture(index, labelText) {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 512;
+                    canvas.height = 512;
+                    const ctx = canvas.getContext('2d');
+
+                    const grad = ctx.createLinearGradient(0, 0, 0, 512);
+                    if (index === 0) {
+                        grad.addColorStop(0, '#2b1055'); // Twilight Purple
+                        grad.addColorStop(1, '#7597de');
+                    } else if (index === 1) {
+                        grad.addColorStop(0, '#f9d423'); // Warm Sunset Gold
+                        grad.addColorStop(1, '#ff4e50');
+                    } else if (index === 2) {
+                        grad.addColorStop(0, '#11998e'); // Midnight Aurora Teal
+                        grad.addColorStop(1, '#38ef7d');
+                    } else if (index === 3) {
+                        grad.addColorStop(0, '#ff9a9e'); // Soft Rose Cream
+                        grad.addColorStop(1, '#fecfef');
+                    } else {
+                        grad.addColorStop(0, '#0f2027'); // Cosmic Nebula Navy
+                        grad.addColorStop(1, '#2c5364');
+                    }
+                    ctx.fillStyle = grad;
+                    ctx.fillRect(0, 0, 512, 512);
+
+                    ctx.save();
+                    ctx.globalCompositeOperation = 'screen';
+                    for (let i = 0; i < 15; i++) {
+                        ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.15 + 0.05})`;
+                        ctx.beginPath();
+                        ctx.arc(Math.random() * 512, Math.random() * 512, Math.random() * 80 + 30, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    ctx.restore();
+
+                    ctx.fillStyle = '#ffd700';
+                    for (let i = 0; i < 20; i++) {
+                        const rx = Math.random() * 512;
+                        const ry = Math.random() * 512;
+                        ctx.beginPath();
+                        ctx.arc(rx, ry, Math.random() * 3 + 1, 0, Math.PI*2);
+                        ctx.fill();
+                    }
+
+                    return new THREE.CanvasTexture(canvas);
+                }
+
+                function generatePolaroidFrameTexture(labelText) {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 512;
+                    canvas.height = 640;
+                    const ctx = canvas.getContext('2d');
+
+                    ctx.fillStyle = '#fbfbf9';
+                    ctx.fillRect(0, 0, 512, 640);
+                    
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.02)';
+                    for (let i = 0; i < 1000; i++) {
+                        ctx.fillRect(Math.random() * 512, Math.random() * 640, 2, 2);
+                    }
+
+                    ctx.strokeStyle = '#eef0ea';
+                    ctx.lineWidth = 4;
+                    ctx.strokeRect(8, 8, 496, 624);
+
+                    ctx.font = '36px "La Belle Aurore", cursive';
+                    ctx.fillStyle = '#4a433f';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(labelText, 256, 575);
+
+                    return new THREE.CanvasTexture(canvas);
+                }
+
+                photoSceneGroup = new THREE.Group();
+                cameraScene.add(photoSceneGroup);
+
+                function createPolaroidPhotos() {
+                    const texLoader = new THREE.TextureLoader();
+
+                    for (let i = 0; i < 5; i++) {
+                        const photoGroup = new THREE.Group();
+                        photoGroup.position.set(0, -0.35, 0.7); // Start inside eject slot position
+                        photoGroup.rotation.set(0, 0, 0);
+                        photoGroup.scale.set(0.001, 0.001, 0.001); // Shrunk initially
+                        photoSceneGroup.add(photoGroup);
+
+                        const frameGeom = new THREE.PlaneGeometry(1.6, 2.0);
+                        const frameTexture = generatePolaroidFrameTexture(polaroidLabels[i]);
+                        const frameMat = new THREE.MeshStandardMaterial({ map: frameTexture, roughness: 0.6 });
+                        const frameMesh = new THREE.Mesh(frameGeom, frameMat);
+                        frameMesh.castShadow = true;
+                        frameMesh.receiveShadow = true;
+                        photoGroup.add(frameMesh);
+
+                        const picGeom = new THREE.PlaneGeometry(1.36, 1.36);
+                        const picTexture = generateProceduralMemoryTexture(i, polaroidLabels[i]);
+                        const picMat = new THREE.MeshStandardMaterial({ map: picTexture, roughness: 0.4 });
+                        const picMesh = new THREE.Mesh(picGeom, picMat);
+                        picMesh.position.set(0, 0.2, 0.015);
+                        photoGroup.add(picMesh);
+
+                        texLoader.load(placeholderImages[i], 
+                            (loadedTex) => {
+                                picMat.map = loadedTex;
+                                picMat.needsUpdate = true;
+                            }, 
+                            undefined, 
+                            (err) => {
+                                console.log(`Using procedural abstract artwork for placeholder Polaroid #${i+1}`);
+                            }
+                        );
+
+                        polaroids.push(photoGroup);
+                    }
+                }
+
+                createPolaroidPhotos();
+                threeJsCameraLoaded = true;
+            } catch (err) {
+                console.warn("Three.js Polaroid setup failed, enabling 2D fallback gallery:", err);
+                const fallback2D = document.getElementById('polaroid-2d-fallback');
+                if (fallback2D) fallback2D.style.display = 'flex';
+            }
+        }
+
+        // GSAP ScrollTrigger timeline to trigger Shutter flash clicks and eject photo cards
+        if (threeJsCameraLoaded) {
+            const cameraTimeline = gsap.timeline({
+                scrollTrigger: {
+                    trigger: "#sec-polaroid",
+                    start: "top top",
+                    end: "+=250%", // Long pinning scroll duration
+                    pin: true,
+                    scrub: 1.0,
+                    onUpdate: (self) => {
+                        // Check shutter trigger moments based on timeline progress levels
+                        const snapMilestones = [0.15, 0.35, 0.55, 0.75, 0.95];
+                        snapMilestones.forEach((m, idx) => {
+                            const hasSnapped = self.progress > m && self.progress < (m + 0.05);
+                            if (hasSnapped && !polaroids[idx].userData.snapped) {
+                                polaroids[idx].userData.snapped = true;
+                                
+                                // Audio shutter click snap
+                                playCameraClick();
+                                
+                                // Screen flash trigger effect
+                                gsap.fromTo("#shutter-flash", { opacity: 0.8 }, { opacity: 0, duration: 0.3, ease: "power1.out" });
+                                
+                                // Visual glow spike light on lens flash
+                                cameraFlashLight.intensity = 6;
+                                gsap.to(cameraFlashLight, { intensity: 0, duration: 0.4 });
+
+                                // Camera icon flash scale/glow effect
+                                gsap.fromTo("#camera-icon-wrap", 
+                                    { scale: 1.3, filter: "drop-shadow(0 0 20px #fff) brightness(2.5)", color: "#ffffff" }, 
+                                    { scale: 1, filter: "drop-shadow(0 0 8px var(--gold-glow)) brightness(1)", color: "var(--gold)", duration: 0.4, ease: "power2.out" }
+                                );
+                            } else if (self.progress < (m - 0.05)) {
+                                // Reset snap state when scrolling backwards
+                                polaroids[idx].userData.snapped = false;
+                            }
+                        });
+                    }
+                }
+            });
+
+            // Timeline layout connecting ejection paths
+            // Photo 1: slides left
+            cameraTimeline.to("#polaroid-title", { opacity: 1, y: 0, duration: 0.5 })
+                          .to("#polaroid-prompt", { opacity: 0.8, y: 0, duration: 0.5 }, "<")
+                          .to("#camera-icon-wrap", { opacity: 1, y: 0, duration: 0.5 }, "<")
+                          
+                          // Polaroid 1 Eject
+                          .to(polaroids[0].scale, { x: 1, y: 1, z: 1, duration: 0.6, ease: "power2.out" })
+                          .to(polaroids[0].position, { x: -2.2, y: 0.5, z: 1.5, duration: 1.2, ease: "power2.out" }, "<")
+                          .to(polaroids[0].rotation, { x: -0.2, y: 0.4, z: 0.3, duration: 1.2, ease: "power2.out" }, "<")
+                          
+                          // Polaroid 2 Eject
+                          .to(polaroids[1].scale, { x: 1, y: 1, z: 1, duration: 0.6, ease: "power2.out" })
+                          .to(polaroids[1].position, { x: 2.2, y: 0.5, z: 1.8, duration: 1.2, ease: "power2.out" }, "<")
+                          .to(polaroids[1].rotation, { x: -0.15, y: -0.4, z: -0.2, duration: 1.2, ease: "power2.out" }, "<")
+                          
+                          // Polaroid 3 Eject
+                          .to(polaroids[2].scale, { x: 1, y: 1, z: 1, duration: 0.6, ease: "power2.out" })
+                          .to(polaroids[2].position, { x: -1.8, y: -0.1, z: 3.2, duration: 1.2, ease: "power2.out" }, "<")
+                          .to(polaroids[2].rotation, { x: -0.1, y: 0.2, z: -0.15, duration: 1.2, ease: "power2.out" }, "<")
+
+                          // Polaroid 4 Eject
+                          .to(polaroids[3].scale, { x: 1, y: 1, z: 1, duration: 0.6, ease: "power2.out" })
+                          .to(polaroids[3].position, { x: 1.8, y: -0.1, z: 3.4, duration: 1.2, ease: "power2.out" }, "<")
+                          .to(polaroids[3].rotation, { x: -0.1, y: -0.25, z: 0.1, duration: 1.2, ease: "power2.out" }, "<")
+                          
+                          // Polaroid 5 Eject
+                          .to(polaroids[4].scale, { x: 1, y: 1, z: 1, duration: 0.6, ease: "power2.out" })
+                          .to(polaroids[4].position, { x: 0, y: -0.2, z: 4.2, duration: 1.2, ease: "power2.out" }, "<")
+                          .to(polaroids[4].rotation, { x: -0.05, y: 0, z: -0.05, duration: 1.2, ease: "power2.out" }, "<")
+                          
+                          // Overlay elements fade out as gallery is complete
+                          .to("#polaroid-title", { opacity: 0, y: -20, duration: 0.6 }, "+=0.3")
+                          .to("#polaroid-prompt", { opacity: 0, y: -20, duration: 0.6 }, "<")
+                          .to("#camera-icon-wrap", { opacity: 0, y: -20, duration: 0.6 }, "<");
+        } else {
+            // WebGL Fallback - fade in the 2D cards on scroll with pinning
+            gsap.timeline({
+                scrollTrigger: {
+                    trigger: "#sec-polaroid",
+                    start: "top top",
+                    end: "+=180%",
+                    pin: true,
+                    scrub: 1.0
+                }
+            })
+            .to("#polaroid-title", { opacity: 1, y: 0, duration: 0.8 })
+            .to("#polaroid-prompt", { opacity: 0.8, y: 0, duration: 0.8 }, "<")
+            .to("#camera-icon-wrap", { opacity: 1, y: 0, duration: 0.8 }, "<")
+            .fromTo(".polaroid-2d", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, stagger: 0.3, duration: 1.5 })
+            .to("#polaroid-title", { opacity: 0, y: -20, duration: 0.8 })
+            .to("#polaroid-prompt", { opacity: 0, y: -20, duration: 0.8 }, "<")
+            .to("#camera-icon-wrap", { opacity: 0, y: -20, duration: 0.8 }, "<");
+        }
+
+
+        // --- 8. SECTION 5: ENDING / SIGNATURE ---
+        // Animate text reveal in ending viewport
+        gsap.to("#ending-msg-1", {
+            opacity: 1,
+            y: 0,
+            duration: 1.5,
+            ease: "power2.out",
+            scrollTrigger: {
+                trigger: "#sec-ending",
+                start: "top 70%",
+                end: "top 40%",
+                scrub: 1.0
+            }
+        });
+
+        // Calligraphic Signature draw animation
+        gsap.to("#ending-signature", {
+            opacity: 1,
+            scale: 1,
+            duration: 2.0,
+            ease: "power1.inOut",
+            scrollTrigger: {
+                trigger: "#sec-ending",
+                start: "top 60%",
+                end: "bottom 90%",
+                scrub: 1.5,
+                onUpdate: (self) => {
+                    const path = document.querySelector("#ending-signature path");
+                    const length = path.getTotalLength();
+                    // Draw outline in path coordinates
+                    path.style.strokeDasharray = length;
+                    path.style.strokeDashoffset = length * (1 - self.progress);
+                }
+            }
+        });
+
+
+        // --- 9. RESIZE & RENDER EVENT LOOPS ---
+        window.addEventListener('resize', () => {
+            // Resize Cake webgl
+            if (threeJsCakeLoaded && cakeCamera && cakeRenderer && cakeContainer) {
+                cakeCamera.aspect = cakeContainer.clientWidth / cakeContainer.clientHeight;
+                cakeCamera.updateProjectionMatrix();
+                cakeRenderer.setSize(cakeContainer.clientWidth, cakeContainer.clientHeight);
+            }
+
+            // Resize Camera webgl
+            if (threeJsCameraLoaded && cameraCam && cameraRenderer && cameraContainer) {
+                cameraCam.aspect = cameraContainer.clientWidth / cameraContainer.clientHeight;
+                cameraCam.updateProjectionMatrix();
+                cameraRenderer.setSize(cameraContainer.clientWidth, cameraContainer.clientHeight);
+            }
+        });
+
+        // Combined loop handler rendering Three.js animations
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = clock.getDelta();
+            const elapsedTime = clock.getElapsedTime();
+
+            // 1. Update Cake Scene Animations
+            if (threeJsCakeLoaded && cakeGroup && flame && cakeRenderer && cakeScene && cakeCamera) {
+                // Gentle procedural bobbing/floating movement for cake
+                cakeGroup.position.y = Math.sin(elapsedTime * 1.5) * 0.08;
+                
+                // Continuous flickering dynamic scale on candle flame mesh
+                const flameFlickerScale = 1.0 + Math.sin(elapsedTime * 30) * 0.08;
+                if (flame.scale.x > 0.01) {
+                    flame.scale.y = flameFlickerScale;
+                    flame.scale.x = 1.0 + Math.cos(elapsedTime * 25) * 0.04;
+                }
+
+                // Smooth interpolation rotation coordinates based on mouse dragging
+                cakeGroup.rotation.y += (cakeTargetRotationY - cakeGroup.rotation.y) * 0.08;
+                cakeGroup.rotation.x += (cakeTargetRotationX - cakeGroup.rotation.x) * 0.08;
+
+                cakeRenderer.render(cakeScene, cakeCamera);
+            }
+            
+            // Update 2D particles
+            updateFireworks();
+
+            // 2. Update Camera Scene Animations
+            if (threeJsCameraLoaded && polaroidCameraGroup && cameraRenderer && cameraScene && cameraCam && polaroids.length) {
+                // Gentle visual hover drift on camera
+                polaroidCameraGroup.position.y = 0.3 + Math.sin(elapsedTime * 1.2) * 0.05;
+                polaroidCameraGroup.rotation.z = Math.sin(elapsedTime * 0.8) * 0.015;
+
+                // Interpolate target rotations based on dragging on camera scene
+                polaroidCameraGroup.rotation.y += (camTargetRotY - polaroidCameraGroup.rotation.y) * 0.08;
+                polaroidCameraGroup.rotation.x += (camTargetRotX - polaroidCameraGroup.rotation.x) * 0.08;
+
+                // Minor orbital floating details on Polaroid mesh stacks
+                polaroids.forEach((pol, idx) => {
+                    // Bob cards slightly on table
+                    if (pol.scale.x > 0.5) {
+                        pol.position.y += Math.sin(elapsedTime * 1.0 + idx) * 0.0005;
+                    }
+                });
+
+                cameraRenderer.render(cameraScene, cameraCam);
+            }
+        }
+
+        animate();
+    </script>
+</body>
+</html>
