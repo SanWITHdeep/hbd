@@ -9,7 +9,7 @@
     <!-- Premium Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cinzel+Decorative:wght@700&family=Inter:wght@300;400;500;600&family=La+Belle+Aurore&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Italiana&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Herr+Von+Muellerhoff&family=Inter:wght@300;400;500;600;800&family=La+Belle+Aurore&family=Anton&display=swap" rel="stylesheet">
     
     <!-- Libraries via CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -29,6 +29,10 @@
             --text-light: #f5f5f7;
             --text-muted: #86868b;
             --font-cinzel: 'Cinzel', serif;
+            --font-italiana: 'Italiana', serif;
+            --font-playfair: 'Playfair Display', serif;
+            --font-cormorant: 'Cormorant Garamond', serif;
+            --font-signature: 'Herr Von Muellerhoff', cursive;
             --font-inter: 'Inter', sans-serif;
             --font-cursive: 'La Belle Aurore', cursive;
         }
@@ -238,24 +242,27 @@
         }
 
         .intro-heading {
-            font-family: var(--font-cinzel);
-            font-size: clamp(2rem, 5vw, 4.5rem);
+            font-family: var(--font-cormorant);
+            font-size: clamp(1.8rem, 6.5vw, 5.2rem);
             font-weight: 300;
-            line-height: 1.4;
-            letter-spacing: 0.1em;
+            font-style: italic;
+            line-height: 1.3;
+            letter-spacing: 0.03em;
+            text-transform: none;
             background: linear-gradient(to right, #ffffff, var(--rose-gold), var(--gold), #ffffff);
             background-size: 300% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             animation: textShimmer 10s linear infinite;
-            text-shadow: 0 0 40px var(--rose-glow);
+            text-shadow: 0 0 35px var(--rose-glow);
             opacity: 0;
             transform: translateY(30px);
         }
 
         .highlight-24 {
-            font-family: 'Cinzel Decorative', var(--font-cinzel), serif;
+            font-family: var(--font-cormorant);
             font-weight: 700;
+            font-style: italic;
             color: var(--gold);
             text-shadow: 0 0 15px var(--gold-glow), 0 0 30px var(--gold-glow);
             background: linear-gradient(135deg, #ffffff 0%, var(--gold) 50%, var(--rose-gold) 100%);
@@ -363,63 +370,94 @@
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            padding: 80px 20px;
+            padding: 6vh 20px;
             pointer-events: none;
         }
 
         .cake-title {
-            font-family: var(--font-cinzel);
+            font-family: var(--font-cormorant);
             font-weight: 300;
-            font-size: clamp(1.8rem, 4vw, 3.4rem);
-            letter-spacing: 0.25em;
+            font-style: italic;
+            font-size: clamp(1.4rem, 4.5vw, 3.6rem);
+            letter-spacing: 0.05em;
+            text-transform: none;
             color: var(--text-light);
-            text-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
             text-align: center;
             opacity: 0;
             transform: translateY(30px);
             will-change: transform, opacity;
         }
 
-        .hbd-title {
-            font-family: var(--font-cinzel);
-            font-size: clamp(2.5rem, 7vw, 6rem);
-            font-weight: 700;
-            letter-spacing: 0.25em;
-            text-transform: uppercase;
-            
-            /* Diamond-Gold metallic gradient */
-            background: linear-gradient(
-                135deg,
-                #d4af37 0%,   /* Gold */
-                #f3e5ab 25%,  /* Diamond Cream */
-                #ffffff 50%,  /* White Shine */
-                #f3e5ab 75%,  /* Diamond Cream */
-                #d4af37 100%  /* Gold */
-            );
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            
-            /* Layered 3D carved gold look */
-            text-shadow: 
-                1px 1px 0px #9e782f,
-                2px 2px 0px #866123,
-                3px 3px 0px #6e4c19,
-                4px 4px 12px rgba(0, 0, 0, 0.6),
-                0 0 20px rgba(212, 175, 55, 0.4),
-                0 0 40px rgba(212, 175, 55, 0.2);
-                
-            animation: metallicShine 6s linear infinite;
-            text-align: center;
+
+        .happy-text-container {
             opacity: 0;
-            transform: scale(0.9);
-            will-change: transform, opacity, filter;
+            will-change: opacity;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
         }
 
-        @keyframes metallicShine {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 200% 50%; }
-            100% { background-position: 0% 50%; }
+        .happy-text-float-wrapper {
+            animation: floatText 4s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .happy-text {
+            font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-weight: 900;
+            font-size: clamp(2.2rem, 10vw, 8.5rem);
+            line-height: 0.9;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: -0.03em;
+            filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 15px rgba(255, 215, 0, 0.45));
+            user-select: none;
+            pointer-events: none;
+            position: relative;
+        }
+
+        .hbd-char {
+            display: inline-block;
+            opacity: 1; /* Safe default for progressive enhancement */
+            will-change: transform, opacity, filter;
+            transition: text-shadow 0.3s;
+            background: linear-gradient(
+                to bottom,
+                #fff9c4 0%,    /* Bright pale yellow-gold shine */
+                #fbc02d 40%,   /* Rich warm gold */
+                #211500 75%,   /* Chrome black-gold shadow band */
+                #ffd54f 100%   /* Gold reflection bottom highlight */
+            );
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        @keyframes floatText {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-12px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .happy-text::after {
+            content: "HAPPY BIRTHDAY";
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+            font-size: inherit;
+            filter: blur(25px);
+            opacity: .15;
+            color: #d4af37;
+            white-space: nowrap;
         }
 
         .cake-instruction {
@@ -484,56 +522,24 @@
         }
 
         .paper-note {
-            background-color: var(--bg-card);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            background: rgba(12, 12, 12, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             padding: 60px 40px;
             width: 100%;
             max-width: 680px;
             border-radius: 12px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9);
             position: relative;
             transform: translateY(60px);
             opacity: 0;
             will-change: transform, opacity;
         }
 
-        /* Dual glowing saber edge borders */
-        .paper-note::before {
-            content: '';
-            position: absolute;
-            top: -1px; left: -1px; right: -1px; bottom: -1px;
-            border-radius: 12px;
-            background: linear-gradient(90deg, var(--gold), var(--rose-gold), var(--gold));
-            background-size: 200% 200%;
-            animation: saberFlow 4s linear infinite;
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        .paper-note::after {
-            content: '';
-            position: absolute;
-            top: -4px; left: -4px; right: -4px; bottom: -4px;
-            border-radius: 12px;
-            background: linear-gradient(90deg, var(--gold), var(--rose-gold), var(--gold));
-            background-size: 200% 200%;
-            animation: saberFlow 4s linear infinite;
-            filter: blur(10px);
-            opacity: 0.8;
-            z-index: -2;
-            pointer-events: none;
-        }
-
-        @keyframes saberFlow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
         .letter-content {
             font-family: var(--font-cursive);
-            font-size: clamp(1.5rem, 2.5vw, 2.2rem);
+            font-size: clamp(1.1rem, 2.2vw, 1.8rem);
             line-height: 1.6;
             color: var(--text-light);
             text-shadow: 0 0 1px rgba(255, 255, 255, 0.2);
@@ -620,16 +626,15 @@
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            padding: 80px 20px;
+            padding: 6vh 20px;
             pointer-events: none;
         }
 
         .polaroid-title {
             font-family: var(--font-cinzel);
-            font-size: clamp(1.8rem, 4vw, 3.2rem);
+            font-size: clamp(1.4rem, 4vw, 3.2rem);
             letter-spacing: 0.15em;
             color: #ffffff;
-            text-align: center;
             text-shadow: 0 0 25px rgba(255, 255, 255, 0.25);
             opacity: 0;
             transform: translateY(20px);
@@ -674,7 +679,7 @@
 
         .ending-text {
             font-family: var(--font-cinzel);
-            font-size: clamp(1.8rem, 3.5vw, 3rem);
+            font-size: clamp(1.4rem, 3.5vw, 3rem);
             font-weight: 300;
             letter-spacing: 0.2em;
             margin-bottom: 20px;
@@ -684,22 +689,31 @@
             text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
         }
 
-        .signature-svg {
-            width: 250px;
-            height: 100px;
-            opacity: 0;
-            transform: scale(0.9);
-            filter: drop-shadow(0 0 8px var(--rose-glow));
+        #ending-msg-1 {
+            font-family: var(--font-cursive) !important;
+            font-size: clamp(2rem, 5.5vw, 3.8rem) !important;
+            color: var(--rose-gold) !important;
+            text-transform: none !important;
+            letter-spacing: 0.03em !important;
+            text-shadow: 0 0 15px var(--rose-glow) !important;
+            margin-bottom: 5px;
         }
 
-        .signature-svg path {
-            fill: none;
-            stroke: var(--rose-gold);
-            stroke-width: 2.5;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            stroke-dasharray: 1000;
-            stroke-dashoffset: 1000;
+        .signature-text {
+            font-family: var(--font-cursive);
+            font-size: clamp(2.2rem, 7vw, 5rem);
+            color: var(--rose-gold);
+            filter: blur(15px) drop-shadow(0 0 10px var(--rose-glow));
+            background: linear-gradient(135deg, var(--rose-gold) 0%, #ffd1dc 50%, var(--rose-gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateY(20px) scale(0.9);
+            margin-top: 15px;
+            padding: 10px 20px;
+            overflow: visible;
         }
 
         /* Responsive UI Scaling adjustments */
@@ -712,9 +726,19 @@
             }
             .paper-note {
                 padding: 40px 25px;
+                width: 92%;
             }
             .letter-content {
                 line-height: 1.5;
+            }
+        }
+
+        @media (max-height: 600px) {
+            .cake-ui-overlay, .polaroid-ui-overlay {
+                padding: 4vh 20px;
+            }
+            .ending-container {
+                gap: 10px;
             }
         }
     </style>
@@ -800,7 +824,14 @@
         <section id="sec-cake">
             <div class="cake-ui-overlay">
                 <h2 class="cake-title" id="cake-title">The Celebration Begins</h2>
-                <h2 class="hbd-title" id="cake-hbd">Happy Birthday!</h2>
+                <div class="happy-text-container" id="cake-hbd">
+                    <div class="happy-text-float-wrapper">
+                        <h1 class="happy-text" id="hbd-random-text">
+                            HAPPY<br>
+                            BIRTHDAY
+                        </h1>
+                    </div>
+                </div>
                 <div style="display:flex; flex-direction:column; align-items:center; gap:8px; pointer-events:none;">
                     <p class="cake-instruction" id="cake-prompt">Scroll to cut the cake</p>
                     <p class="cake-info-note" id="cake-info-note">Tip: Drag the cake to rotate in 3D</p>
@@ -870,11 +901,7 @@
         <section id="sec-ending">
             <div class="ending-container">
                 <h2 class="ending-text" id="ending-msg-1">With Love,</h2>
-                <!-- Elegantly animated signature SVG -->
-                <svg class="signature-svg" id="ending-signature" viewBox="0 0 350 150">
-                    <!-- Calligraphic signature path representing custom handwriting for Sandy -->
-                    <path d="M 60,95 C 50,75 65,40 85,45 C 105,50 85,85 70,100 C 65,105 80,105 95,95 C 105,85 115,75 120,85 C 125,95 120,100 130,95 C 140,90 145,80 150,85 C 155,90 150,100 160,95 C 170,90 175,80 180,85 L 180,45 L 180,95 C 180,100 190,95 195,90 C 200,85 205,80 210,85 C 215,90 210,110 205,125 C 200,140 190,135 205,115 C 220,95 250,90 290,95" />
-                </svg>
+                <span class="signature-text" id="ending-signature">Sandy</span>
             </div>
         </section>
 
@@ -1386,8 +1413,9 @@
                 const cakeHeight = cakeContainer.clientHeight > 0 ? cakeContainer.clientHeight : window.innerHeight;
                 const cakeAspect = cakeWidth / cakeHeight;
 
-                cakeCamera = new THREE.PerspectiveCamera(45, cakeAspect, 0.1, 100);
-                cakeCamera.position.set(0, 3.5, 7.5);
+                const isMobile = window.innerWidth < 768;
+                cakeCamera = new THREE.PerspectiveCamera(isMobile ? 55 : 45, cakeAspect, 0.1, 100);
+                cakeCamera.position.set(0, isMobile ? 4.5 : 3.5, isMobile ? 8.5 : 7.5);
                 cakeCamera.lookAt(0, 1.2, 0);
 
                 cakeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -1598,11 +1626,11 @@
                 // Realistic chef's knife mesh (aligned horizontally along X, cutting edge facing down)
                 knifeGroup = new THREE.Group();
                 
-                // Blade: custom 3D shape representing curved chef's knife blade
+                // Blade: custom 3D shape representing curved chef's knife blade (extends to negative X, pointing left)
                 const bladeShape = new THREE.Shape();
                 bladeShape.moveTo(0, -0.15); // Start at bottom bolster
-                bladeShape.lineTo(1.8, -0.15); // Straight cutting edge
-                bladeShape.quadraticCurveTo(2.1, -0.12, 2.25, 0.15); // Tip curve
+                bladeShape.lineTo(-1.8, -0.15); // Straight cutting edge extending left
+                bladeShape.quadraticCurveTo(-2.1, -0.12, -2.25, 0.15); // Tip curve on left
                 bladeShape.lineTo(0, 0.15); // Top spine
                 bladeShape.lineTo(0, -0.15);
 
@@ -1625,7 +1653,7 @@
                 blade.castShadow = true;
                 knifeGroup.add(blade);
                 
-                // Handle: extends from blade (x < 0)
+                // Handle: extends from bolster to the right (x > 0)
                 const handleGeom = new THREE.CylinderGeometry(0.05, 0.05, 0.8, 12);
                 const handleMat = new THREE.MeshStandardMaterial({ 
                     color: 0x3d2314, // Wooden brown handle (walnut wood look)
@@ -1633,12 +1661,12 @@
                 });
                 const handle = new THREE.Mesh(handleGeom, handleMat);
                 handle.rotation.z = Math.PI / 2; // Lie along X axis
-                handle.position.set(-0.4, 0, 0); // Shift handle left of bolster pivot
+                handle.position.set(0.4, 0, 0); // Shift handle right of bolster pivot
                 handle.castShadow = true;
                 knifeGroup.add(handle);
 
-                knifeGroup.position.set(1.5, 3.8, 0); // High above relative to cakeGroup
-                knifeGroup.rotation.z = -Math.PI / 6; // Angled down
+                knifeGroup.position.set(0, 3.8, 3.5); // High above and in front of cake (along positive Z)
+                knifeGroup.rotation.set(0, -Math.PI / 2, Math.PI / 6); // Aligned with Z-axis, angled down
                 cakeGroup.add(knifeGroup); // Add to cakeGroup so it rotates with cake interaction!
                 
                 threeJsCakeLoaded = true;
@@ -1737,6 +1765,31 @@
             fwCanvas.height = window.innerHeight;
         });
 
+        // Split HAPPY BIRTHDAY text dynamically into individual characters for GSAP stagger blur entrance
+        const hbdTextEl = document.getElementById('hbd-random-text');
+        if (hbdTextEl) {
+            const originalHTML = hbdTextEl.innerHTML.trim();
+            hbdTextEl.innerHTML = '';
+            let currentPos = 0;
+            while (currentPos < originalHTML.length) {
+                if (originalHTML.substr(currentPos, 4) === '<br>') {
+                    const br = document.createElement('br');
+                    hbdTextEl.appendChild(br);
+                    currentPos += 4;
+                } else if (originalHTML[currentPos] === '\n' || originalHTML[currentPos] === ' ') {
+                    const space = document.createTextNode(originalHTML[currentPos]);
+                    hbdTextEl.appendChild(space);
+                    currentPos++;
+                } else {
+                    const span = document.createElement('span');
+                    span.className = 'hbd-char';
+                    span.textContent = originalHTML[currentPos];
+                    hbdTextEl.appendChild(span);
+                    currentPos++;
+                }
+            }
+        }
+
         // GSAP ScrollTrigger timeline to orchestrate the cake scene
         if (threeJsCakeLoaded) {
             const cakeTimeline = gsap.timeline({
@@ -1767,8 +1820,8 @@
                 }
             });
 
-            // Stage 1: Move knife from starting point down through cake center
-            cakeTimeline.to(knifeGroup.position, { x: 0, y: 0.6, z: 0, duration: 1.5, ease: "power1.inOut" })
+            // Stage 1: Move knife from starting point down through cake center (blade leading, aligned with Z-axis cut)
+            cakeTimeline.to(knifeGroup.position, { x: 0, y: 0.6, z: 2.0, duration: 1.5, ease: "power1.inOut" })
                         .to(knifeGroup.rotation, { z: 0, duration: 1.0, ease: "power1.inOut" }, "<")
                         
                         // Show instruction elements fade in
@@ -1776,24 +1829,42 @@
                         .to("#cake-prompt", { opacity: 0.8, y: 0, duration: 0.8 }, "<")
                         .to("#cake-info-note", { opacity: 0.8, y: 0, duration: 0.8 }, "<")
                         
-                        // Stage 2: Slicing - Move slice outward radially along slice center (angle Math.PI/12 or 15 degrees)
+                        // Stage 2: Slicing - Move slice outward radially along slice center (angle Math.PI/12 or 15 degrees from Z-axis)
                         .to(fullSliceGroup.position, {
-                            x: 0.5 * Math.cos(Math.PI / 12),
-                            z: 0.5 * Math.sin(Math.PI / 12),
+                            x: 0.5 * Math.sin(Math.PI / 12),
+                            z: 0.5 * Math.cos(Math.PI / 12),
                             duration: 1.5,
                             ease: "power2.out"
                         })
                         
-                        // Stage 3: Knife retraction & lift away
-                        .to(knifeGroup.position, { x: -3.0, y: 4.5, z: -1.0, duration: 1.0, ease: "power2.in" })
-                        .to(knifeGroup.rotation, { z: -Math.PI / 3, duration: 1.0, ease: "power2.in" }, "<")
+                        // Stage 3: Knife retraction & lift away (retracts up and back along Z-axis)
+                        .to(knifeGroup.position, { x: 0, y: 4.5, z: 4.5, duration: 1.0, ease: "power2.in" })
+                        .to(knifeGroup.rotation, { z: Math.PI / 3, duration: 1.0, ease: "power2.in" }, "<")
                         
                         // Stage 4: HBD Title display & celebration glow fading in
-                        .to("#cake-hbd", { opacity: 1, scale: 1.0, duration: 1.5, ease: "back.out(1.7)" })
+                        .to("#cake-hbd", { opacity: 1, duration: 0.2 })
+                        .fromTo(".hbd-char", 
+                            {
+                                opacity: 0,
+                                filter: "blur(12px)",
+                                scale: 1.6
+                            },
+                            {
+                                opacity: 1,
+                                filter: "blur(0px)",
+                                scale: 1,
+                                duration: 1.4,
+                                ease: "back.out(1.4)",
+                                stagger: {
+                                    amount: 1.2,
+                                    from: "random"
+                                }
+                            }, "<")
                         .to("#cake-title", { opacity: 0, y: -20, duration: 0.8 }, "<")
                         .to("#cake-prompt", { opacity: 0, y: -20, duration: 0.8 }, "<")
                         .to("#cake-info-note", { opacity: 0, y: -20, duration: 0.8 }, "<")
-                        .to("#cake-webgl-container", { filter: "blur(8px) brightness(0.45)", opacity: 0.4, duration: 1.5 }, "<");
+                        .to("#cake-webgl-container", { filter: "blur(8px) brightness(0.45)", opacity: 0.4, duration: 1.5 }, "<")
+                        .set(".hbd-char", { filter: "none", clearProps: "filter,transform" });
         } else {
             // WebGL Fallback - fade in the title, then show "Happy Birthday!"
             gsap.timeline({
@@ -1812,11 +1883,29 @@
             .to("#cake-title", { opacity: 1, y: 0, duration: 0.8 })
             .to("#cake-prompt", { opacity: 0.8, y: 0, duration: 0.8 }, "<")
             .to("#cake-info-note", { opacity: 0.8, y: 0, duration: 0.8 }, "<")
-            .to("#cake-hbd", { opacity: 1, scale: 1.0, duration: 1.2, ease: "back.out(1.7)" })
+            .to("#cake-hbd", { opacity: 1, duration: 0.2 })
+            .fromTo(".hbd-char",
+                {
+                    opacity: 0,
+                    filter: "blur(12px)",
+                    scale: 1.6
+                },
+                {
+                    opacity: 1,
+                    filter: "blur(0px)",
+                    scale: 1,
+                    duration: 1.2,
+                    ease: "back.out(1.4)",
+                    stagger: {
+                        amount: 1.0,
+                        from: "random"
+                    }
+                }, "<")
             .to("#cake-title", { opacity: 0, y: -20, duration: 0.8 }, "<")
             .to("#cake-prompt", { opacity: 0, y: -20, duration: 0.8 }, "<")
             .to("#cake-info-note", { opacity: 0, y: -20, duration: 0.8 }, "<")
-            .to("#cake-webgl-container", { filter: "blur(5px)", opacity: 0.4, duration: 1.2 }, "<");
+            .to("#cake-webgl-container", { filter: "blur(5px)", opacity: 0.4, duration: 1.2 }, "<")
+            .set(".hbd-char", { filter: "none", clearProps: "filter,transform" });
         }
 
 
@@ -1910,8 +1999,9 @@
                 const camHeight = cameraContainer.clientHeight > 0 ? cameraContainer.clientHeight : window.innerHeight;
                 const camAspect = camWidth / camHeight;
 
-                cameraCam = new THREE.PerspectiveCamera(40, camAspect, 0.1, 100);
-                cameraCam.position.set(0, 4.0, 7.5);
+                const isMobile = window.innerWidth < 768;
+                cameraCam = new THREE.PerspectiveCamera(isMobile ? 50 : 40, camAspect, 0.1, 100);
+                cameraCam.position.set(0, isMobile ? 5.5 : 4.0, isMobile ? 9.5 : 7.5);
                 cameraCam.lookAt(0, 0.5, 0);
 
                 cameraRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -2224,33 +2314,40 @@
                           
                           // Polaroid 1 Eject
                           .to(polaroids[0].scale, { x: 1, y: 1, z: 1, duration: 0.6, ease: "power2.out" })
-                          .to(polaroids[0].position, { x: -2.2, y: 0.5, z: 1.5, duration: 1.2, ease: "power2.out" }, "<")
+                          .to(polaroids[0].position, { x: -2.2, y: 0.8, z: 1.5, duration: 1.2, ease: "power2.out" }, "<")
                           .to(polaroids[0].rotation, { x: -0.2, y: 0.4, z: 0.3, duration: 1.2, ease: "power2.out" }, "<")
                           
                           // Polaroid 2 Eject
                           .to(polaroids[1].scale, { x: 1, y: 1, z: 1, duration: 0.6, ease: "power2.out" })
-                          .to(polaroids[1].position, { x: 2.2, y: 0.5, z: 1.8, duration: 1.2, ease: "power2.out" }, "<")
+                          .to(polaroids[1].position, { x: 2.2, y: 0.8, z: 1.8, duration: 1.2, ease: "power2.out" }, "<")
                           .to(polaroids[1].rotation, { x: -0.15, y: -0.4, z: -0.2, duration: 1.2, ease: "power2.out" }, "<")
                           
                           // Polaroid 3 Eject
                           .to(polaroids[2].scale, { x: 1, y: 1, z: 1, duration: 0.6, ease: "power2.out" })
-                          .to(polaroids[2].position, { x: -1.8, y: -0.1, z: 3.2, duration: 1.2, ease: "power2.out" }, "<")
+                          .to(polaroids[2].position, { x: -1.8, y: 0.5, z: 2.0, duration: 1.2, ease: "power2.out" }, "<")
                           .to(polaroids[2].rotation, { x: -0.1, y: 0.2, z: -0.15, duration: 1.2, ease: "power2.out" }, "<")
 
                           // Polaroid 4 Eject
                           .to(polaroids[3].scale, { x: 1, y: 1, z: 1, duration: 0.6, ease: "power2.out" })
-                          .to(polaroids[3].position, { x: 1.8, y: -0.1, z: 3.4, duration: 1.2, ease: "power2.out" }, "<")
+                          .to(polaroids[3].position, { x: 1.8, y: 0.5, z: 2.2, duration: 1.2, ease: "power2.out" }, "<")
                           .to(polaroids[3].rotation, { x: -0.1, y: -0.25, z: 0.1, duration: 1.2, ease: "power2.out" }, "<")
                           
                           // Polaroid 5 Eject
                           .to(polaroids[4].scale, { x: 1, y: 1, z: 1, duration: 0.6, ease: "power2.out" })
-                          .to(polaroids[4].position, { x: 0, y: -0.2, z: 4.2, duration: 1.2, ease: "power2.out" }, "<")
+                          .to(polaroids[4].position, { x: 0, y: 0.3, z: 2.5, duration: 1.2, ease: "power2.out" }, "<")
                           .to(polaroids[4].rotation, { x: -0.05, y: 0, z: -0.05, duration: 1.2, ease: "power2.out" }, "<")
                           
-                          // Overlay elements fade out as gallery is complete
+                          // Overlay elements and camera/polaroids scale down as gallery is complete to avoid clipping
                           .to("#polaroid-title", { opacity: 0, y: -20, duration: 0.6 }, "+=0.3")
                           .to("#polaroid-prompt", { opacity: 0, y: -20, duration: 0.6 }, "<")
-                          .to("#camera-icon-wrap", { opacity: 0, y: -20, duration: 0.6 }, "<");
+                          .to("#camera-icon-wrap", { opacity: 0, y: -20, duration: 0.6 }, "<")
+                          .to(polaroids[0].scale, { x: 0.001, y: 0.001, z: 0.001, duration: 0.6, ease: "power2.in" }, "<")
+                          .to(polaroids[1].scale, { x: 0.001, y: 0.001, z: 0.001, duration: 0.6, ease: "power2.in" }, "<")
+                          .to(polaroids[2].scale, { x: 0.001, y: 0.001, z: 0.001, duration: 0.6, ease: "power2.in" }, "<")
+                          .to(polaroids[3].scale, { x: 0.001, y: 0.001, z: 0.001, duration: 0.6, ease: "power2.in" }, "<")
+                          .to(polaroids[4].scale, { x: 0.001, y: 0.001, z: 0.001, duration: 0.6, ease: "power2.in" }, "<")
+                          .to(polaroidCameraGroup.scale, { x: 0.001, y: 0.001, z: 0.001, duration: 0.6, ease: "power2.in" }, "<")
+                          .to("#camera-webgl-container", { opacity: 0, duration: 0.6, ease: "power2.in" }, "<");
         } else {
             // WebGL Fallback - fade in the 2D cards on scroll with pinning
             gsap.timeline({
@@ -2268,7 +2365,8 @@
             .fromTo(".polaroid-2d", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, stagger: 0.3, duration: 1.5 })
             .to("#polaroid-title", { opacity: 0, y: -20, duration: 0.8 })
             .to("#polaroid-prompt", { opacity: 0, y: -20, duration: 0.8 }, "<")
-            .to("#camera-icon-wrap", { opacity: 0, y: -20, duration: 0.8 }, "<");
+            .to("#camera-icon-wrap", { opacity: 0, y: -20, duration: 0.8 }, "<")
+            .to(".polaroid-2d", { opacity: 0, scale: 0.001, duration: 0.8 }, "<");
         }
 
 
@@ -2287,33 +2385,30 @@
             }
         });
 
-        // Calligraphic Signature draw animation
+        // Elegant Signature handwritten-font blur/scale reveal
         gsap.to("#ending-signature", {
             opacity: 1,
+            filter: "blur(0px) drop-shadow(0 0 10px var(--rose-glow))",
+            y: 0,
             scale: 1,
-            duration: 2.0,
-            ease: "power1.inOut",
+            ease: "sine.inOut",
             scrollTrigger: {
                 trigger: "#sec-ending",
-                start: "top 60%",
-                end: "bottom 90%",
-                scrub: 1.5,
-                onUpdate: (self) => {
-                    const path = document.querySelector("#ending-signature path");
-                    const length = path.getTotalLength();
-                    // Draw outline in path coordinates
-                    path.style.strokeDasharray = length;
-                    path.style.strokeDashoffset = length * (1 - self.progress);
-                }
+                start: "top 85%",
+                end: "bottom 100%",
+                scrub: 2.5
             }
         });
 
 
         // --- 9. RESIZE & RENDER EVENT LOOPS ---
         window.addEventListener('resize', () => {
+            const isMobile = window.innerWidth < 768;
             // Resize Cake webgl
             if (threeJsCakeLoaded && cakeCamera && cakeRenderer && cakeContainer) {
                 cakeCamera.aspect = cakeContainer.clientWidth / cakeContainer.clientHeight;
+                cakeCamera.fov = isMobile ? 55 : 45;
+                cakeCamera.position.set(0, isMobile ? 4.5 : 3.5, isMobile ? 8.5 : 7.5);
                 cakeCamera.updateProjectionMatrix();
                 cakeRenderer.setSize(cakeContainer.clientWidth, cakeContainer.clientHeight);
             }
@@ -2321,6 +2416,8 @@
             // Resize Camera webgl
             if (threeJsCameraLoaded && cameraCam && cameraRenderer && cameraContainer) {
                 cameraCam.aspect = cameraContainer.clientWidth / cameraContainer.clientHeight;
+                cameraCam.fov = isMobile ? 50 : 40;
+                cameraCam.position.set(0, isMobile ? 5.5 : 4.0, isMobile ? 9.5 : 7.5);
                 cameraCam.updateProjectionMatrix();
                 cameraRenderer.setSize(cameraContainer.clientWidth, cameraContainer.clientHeight);
             }
@@ -2344,6 +2441,11 @@
                 if (flame.scale.x > 0.01) {
                     flame.scale.y = flameFlickerScale;
                     flame.scale.x = 1.0 + Math.cos(elapsedTime * 25) * 0.04;
+                }
+
+                // Auto rotate cake model slowly if the user is not dragging
+                if (!isCakeDragging) {
+                    cakeTargetRotationY += delta * 0.15;
                 }
 
                 // Smooth interpolation rotation coordinates based on mouse dragging
