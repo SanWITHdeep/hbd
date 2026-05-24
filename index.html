@@ -58,6 +58,11 @@
             height: auto;
         }
 
+        body.locked {
+            overflow: hidden !important;
+            height: 100vh !important;
+        }
+
         .lenis.lenis-smooth {
             scroll-behavior: auto !important;
         }
@@ -631,9 +636,9 @@
         }
 
         .polaroid-title {
-            font-family: var(--font-cinzel);
-            font-size: clamp(1.4rem, 4vw, 3.2rem);
-            letter-spacing: 0.15em;
+            font-family: var(--font-cursive);
+            font-size: clamp(2.2rem, 6vw, 4.2rem);
+            letter-spacing: 0.03em;
             color: #ffffff;
             text-shadow: 0 0 25px rgba(255, 255, 255, 0.25);
             opacity: 0;
@@ -731,6 +736,14 @@
             .letter-content {
                 line-height: 1.5;
             }
+            .happy-text {
+                font-size: clamp(3.2rem, 13vw, 5.5rem);
+                line-height: 0.95;
+            }
+            .happy-text-container {
+                margin-top: 20px;
+                margin-bottom: 20px;
+            }
         }
 
         @media (max-height: 600px) {
@@ -741,9 +754,164 @@
                 gap: 10px;
             }
         }
+
+        /* Date Combination Lock Styling */
+        .overlay-subtitle {
+            font-family: var(--font-inter);
+            font-size: 0.85rem;
+            letter-spacing: 0.12em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 35px;
+            text-align: center;
+        }
+
+        .lock-wrapper {
+            position: relative;
+            background: rgba(255, 255, 255, 0.015);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 35px 45px;
+            border-radius: 16px;
+            box-shadow: 0 25px 55px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            display: inline-block;
+            margin-bottom: 25px;
+        }
+
+        .lock-track {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100%;
+            height: 52px;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.06), transparent);
+            border-top: 1px dashed rgba(212, 175, 55, 0.25);
+            border-bottom: 1px dashed rgba(212, 175, 55, 0.25);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .lock-wheels-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            position: relative;
+            z-index: 3;
+        }
+
+        .lock-divider {
+            font-family: var(--font-inter);
+            font-size: 2.2rem;
+            font-weight: 300;
+            color: rgba(212, 175, 55, 0.3);
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+            user-select: none;
+            padding-bottom: 25px;
+        }
+
+        .lock-wheel-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            user-select: none;
+        }
+
+        .lock-wheel-arrow {
+            color: rgba(255, 255, 255, 0.35);
+            font-size: 0.8rem;
+            cursor: pointer;
+            padding: 5px;
+            transition: all 0.3s;
+        }
+
+        .lock-wheel-arrow:hover {
+            color: var(--gold);
+            transform: scale(1.2);
+            text-shadow: 0 0 8px var(--gold-glow);
+        }
+
+        .lock-wheel {
+            width: 70px;
+            height: 150px;
+            overflow: hidden;
+            position: relative;
+            mask-image: linear-gradient(to bottom, transparent, #000 35%, #000 65%, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, transparent, #000 35%, #000 65%, transparent);
+            cursor: grab;
+        }
+
+        .lock-wheel:active {
+            cursor: grabbing;
+        }
+
+        #wheel-year-wrap .lock-wheel {
+            width: 95px;
+        }
+
+        .lock-wheel-scroll {
+            position: absolute;
+            width: 100%;
+            top: 0;
+            left: 0;
+            will-change: transform;
+        }
+
+        .lock-item {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-inter);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.3);
+            transition: all 0.25s ease-out;
+        }
+
+        .lock-item.active {
+            color: var(--gold);
+            font-size: 1.85rem;
+            font-weight: 800;
+            text-shadow: 0 0 15px var(--gold-glow);
+        }
+
+        .lock-wheel-label {
+            font-family: var(--font-inter);
+            font-size: 0.65rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            color: var(--text-muted);
+            margin-top: 15px;
+            text-transform: uppercase;
+        }
+
+        .lock-status {
+            font-family: var(--font-inter);
+            font-size: 0.85rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: #ff5252;
+            text-shadow: 0 0 10px rgba(255, 82, 82, 0.3);
+            transition: all 0.4s;
+            text-align: center;
+        }
+
+        .lock-status.unlocked {
+            color: #4caf50;
+            text-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+            animation: statusPulse 1.2s infinite ease-in-out;
+        }
+
+        @keyframes statusPulse {
+            0%, 100% { transform: scale(1.0); }
+            50% { transform: scale(1.05); }
+        }
     </style>
 </head>
-<body>
+<body class="locked">
 
     <!-- Camera click flash element -->
     <div id="shutter-flash"></div>
@@ -755,7 +923,42 @@
     <div id="entry-overlay">
         <div class="overlay-content">
             <h2 class="overlay-title">A Journey Awaits</h2>
-            <button class="btn-enter" onclick="enterExperience()">Unlock Magic</button>
+            <p class="overlay-subtitle">Align the combination to unlock the journey</p>
+            
+            <div class="lock-wrapper">
+                <div class="lock-track"></div>
+                <div class="lock-wheels-container">
+                    <!-- Day Wheel -->
+                    <div class="lock-wheel-wrapper" id="wheel-day-wrap">
+                        <div class="lock-wheel-arrow up">▲</div>
+                        <div class="lock-wheel" id="wheel-day" data-type="day"></div>
+                        <div class="lock-wheel-arrow down">▼</div>
+                        <div class="lock-wheel-label">DD</div>
+                    </div>
+                    
+                    <div class="lock-divider">|</div>
+
+                    <!-- Month Wheel -->
+                    <div class="lock-wheel-wrapper" id="wheel-month-wrap">
+                        <div class="lock-wheel-arrow up">▲</div>
+                        <div class="lock-wheel" id="wheel-month" data-type="month"></div>
+                        <div class="lock-wheel-arrow down">▼</div>
+                        <div class="lock-wheel-label">MM</div>
+                    </div>
+                    
+                    <div class="lock-divider">|</div>
+
+                    <!-- Year Wheel -->
+                    <div class="lock-wheel-wrapper" id="wheel-year-wrap">
+                        <div class="lock-wheel-arrow up">▲</div>
+                        <div class="lock-wheel" id="wheel-year" data-type="year"></div>
+                        <div class="lock-wheel-arrow down">▼</div>
+                        <div class="lock-wheel-label">YYYY</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="lock-status" id="lock-status">Combination Locked</div>
         </div>
     </div>
 
@@ -1026,6 +1229,8 @@
 
         function enterExperience() {
             experienceEntered = true;
+            document.body.classList.remove('locked');
+            if (lenis) lenis.start();
             document.getElementById('entry-overlay').style.opacity = '0';
             
             // Initialize music objects after user click
@@ -1066,6 +1271,7 @@
             gsap.ticker.lagSmoothing(0);
         }
         initLenis();
+        lenis.stop();
 
         // Linked Top Scroll progress bar
         gsap.to("#top-progress", {
@@ -1440,7 +1646,7 @@
                         const deltaY = y - previousMousePosition.y;
                         
                         cakeTargetRotationY += deltaX * 0.007;
-                        cakeTargetRotationX = Math.max(-0.4, Math.min(0.8, cakeTargetRotationX + deltaY * 0.007));
+                        cakeTargetRotationX = Math.max(-0.08, Math.min(0.7, cakeTargetRotationX + deltaY * 0.007));
                         
                         previousMousePosition = { x, y };
                     };
@@ -2267,6 +2473,11 @@
 
         // GSAP ScrollTrigger timeline to trigger Shutter flash clicks and eject photo cards
         if (threeJsCameraLoaded) {
+            const isMobileCamera = window.innerWidth < 768;
+            const xMult = isMobileCamera ? 0.55 : 1.0;
+            const zMult = isMobileCamera ? 0.85 : 1.0;
+            const sizeScale = isMobileCamera ? 0.7 : 1.0;
+
             const cameraTimeline = gsap.timeline({
                 scrollTrigger: {
                     trigger: "#sec-polaroid",
@@ -2311,30 +2522,29 @@
             cameraTimeline.to("#polaroid-title", { opacity: 1, y: 0, duration: 0.5 })
                           .to("#polaroid-prompt", { opacity: 0.8, y: 0, duration: 0.5 }, "<")
                           .to("#camera-icon-wrap", { opacity: 1, y: 0, duration: 0.5 }, "<")
-                          
-                          // Polaroid 1 Eject
-                          .to(polaroids[0].scale, { x: 1, y: 1, z: 1, duration: 0.6, ease: "power2.out" })
-                          .to(polaroids[0].position, { x: -2.2, y: 0.8, z: 1.5, duration: 1.2, ease: "power2.out" }, "<")
+                                                // Polaroid 1 Eject
+                          .to(polaroids[0].scale, { x: sizeScale, y: sizeScale, z: sizeScale, duration: 0.6, ease: "power2.out" })
+                          .to(polaroids[0].position, { x: -2.2 * xMult, y: 0.8, z: 1.5 * zMult, duration: 1.2, ease: "power2.out" }, "<")
                           .to(polaroids[0].rotation, { x: -0.2, y: 0.4, z: 0.3, duration: 1.2, ease: "power2.out" }, "<")
                           
                           // Polaroid 2 Eject
-                          .to(polaroids[1].scale, { x: 1, y: 1, z: 1, duration: 0.6, ease: "power2.out" })
-                          .to(polaroids[1].position, { x: 2.2, y: 0.8, z: 1.8, duration: 1.2, ease: "power2.out" }, "<")
+                          .to(polaroids[1].scale, { x: sizeScale, y: sizeScale, z: sizeScale, duration: 0.6, ease: "power2.out" })
+                          .to(polaroids[1].position, { x: 2.2 * xMult, y: 0.8, z: 1.8 * zMult, duration: 1.2, ease: "power2.out" }, "<")
                           .to(polaroids[1].rotation, { x: -0.15, y: -0.4, z: -0.2, duration: 1.2, ease: "power2.out" }, "<")
                           
                           // Polaroid 3 Eject
-                          .to(polaroids[2].scale, { x: 1, y: 1, z: 1, duration: 0.6, ease: "power2.out" })
-                          .to(polaroids[2].position, { x: -1.8, y: 0.5, z: 2.0, duration: 1.2, ease: "power2.out" }, "<")
+                          .to(polaroids[2].scale, { x: sizeScale, y: sizeScale, z: sizeScale, duration: 0.6, ease: "power2.out" })
+                          .to(polaroids[2].position, { x: -1.8 * xMult, y: 0.5, z: 2.0 * zMult, duration: 1.2, ease: "power2.out" }, "<")
                           .to(polaroids[2].rotation, { x: -0.1, y: 0.2, z: -0.15, duration: 1.2, ease: "power2.out" }, "<")
-
+ 
                           // Polaroid 4 Eject
-                          .to(polaroids[3].scale, { x: 1, y: 1, z: 1, duration: 0.6, ease: "power2.out" })
-                          .to(polaroids[3].position, { x: 1.8, y: 0.5, z: 2.2, duration: 1.2, ease: "power2.out" }, "<")
+                          .to(polaroids[3].scale, { x: sizeScale, y: sizeScale, z: sizeScale, duration: 0.6, ease: "power2.out" })
+                          .to(polaroids[3].position, { x: 1.8 * xMult, y: 0.5, z: 2.2 * zMult, duration: 1.2, ease: "power2.out" }, "<")
                           .to(polaroids[3].rotation, { x: -0.1, y: -0.25, z: 0.1, duration: 1.2, ease: "power2.out" }, "<")
                           
                           // Polaroid 5 Eject
-                          .to(polaroids[4].scale, { x: 1, y: 1, z: 1, duration: 0.6, ease: "power2.out" })
-                          .to(polaroids[4].position, { x: 0, y: 0.3, z: 2.5, duration: 1.2, ease: "power2.out" }, "<")
+                          .to(polaroids[4].scale, { x: sizeScale, y: sizeScale, z: sizeScale, duration: 0.6, ease: "power2.out" })
+                          .to(polaroids[4].position, { x: 0, y: 0.3, z: 2.5 * zMult, duration: 1.2, ease: "power2.out" }, "<")
                           .to(polaroids[4].rotation, { x: -0.05, y: 0, z: -0.05, duration: 1.2, ease: "power2.out" }, "<")
                           
                           // Overlay elements and camera/polaroids scale down as gallery is complete to avoid clipping
@@ -2479,6 +2689,218 @@
                 cameraRenderer.render(cameraScene, cameraCam);
             }
         }
+
+        // --- 10. DATE COMBINATION LOCK LOGIC ---
+        const lockCombination = { day: 3, month: 6, year: 2002 };
+        const currentLockState = { day: 1, month: 1, year: 1998 };
+        let combinationCheckedAndPassed = false;
+
+        function playLockTick() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.015);
+                
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.015);
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.02);
+            } catch (err) {}
+        }
+
+        function playUnlockSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc1 = audioCtx.createOscillator();
+                const osc2 = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(800, audioCtx.currentTime);
+                osc1.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.05);
+                
+                osc2.type = 'triangle';
+                osc2.frequency.setValueAtTime(400, audioCtx.currentTime);
+                osc2.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.08);
+
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.4, audioCtx.currentTime + 0.05);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+                
+                osc1.connect(gain);
+                osc2.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc1.start();
+                osc2.start();
+                osc1.stop(audioCtx.currentTime + 0.15);
+                osc2.stop(audioCtx.currentTime + 0.15);
+            } catch (err) {}
+        }
+
+        function checkLockCombination() {
+            if (combinationCheckedAndPassed) return;
+
+            if (currentLockState.day === lockCombination.day &&
+                currentLockState.month === lockCombination.month &&
+                currentLockState.year === lockCombination.year) {
+                
+                combinationCheckedAndPassed = true;
+                
+                const status = document.getElementById('lock-status');
+                status.textContent = "Access Granted";
+                status.classList.add('unlocked');
+                
+                playUnlockSound();
+                
+                setTimeout(() => {
+                    enterExperience();
+                }, 1000);
+            }
+        }
+
+        function setupWheel(wheelId, values, initialValue) {
+            const wheelEl = document.getElementById(wheelId);
+            const scrollEl = document.createElement('div');
+            scrollEl.className = 'lock-wheel-scroll';
+            wheelEl.appendChild(scrollEl);
+
+            values.forEach((val) => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'lock-item';
+                itemEl.textContent = val < 10 ? '0' + val : val;
+                scrollEl.appendChild(itemEl);
+            });
+
+            let currentIndex = values.indexOf(initialValue);
+            if (currentIndex === -1) currentIndex = 0;
+            
+            let dragY = (1 - currentIndex) * 50;
+
+            function updateWheelPosition(smooth = true) {
+                currentIndex = Math.max(0, Math.min(values.length - 1, currentIndex));
+                dragY = (1 - currentIndex) * 50;
+                if (smooth) {
+                    scrollEl.style.transition = 'transform 0.35s cubic-bezier(0.25, 1, 0.5, 1)';
+                } else {
+                    scrollEl.style.transition = 'none';
+                }
+                scrollEl.style.transform = `translateY(${dragY}px)`;
+
+                const items = scrollEl.querySelectorAll('.lock-item');
+                items.forEach((item, idx) => {
+                    if (idx === currentIndex) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
+                    }
+                });
+
+                const type = wheelEl.getAttribute('data-type');
+                currentLockState[type] = values[currentIndex];
+
+                playLockTick();
+                checkLockCombination();
+            }
+
+            const wrapper = wheelEl.parentElement;
+            const upArrow = wrapper.querySelector('.lock-wheel-arrow.up');
+            const downArrow = wrapper.querySelector('.lock-wheel-arrow.down');
+
+            upArrow.addEventListener('click', () => {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    updateWheelPosition();
+                }
+            });
+
+            downArrow.addEventListener('click', () => {
+                if (currentIndex < values.length - 1) {
+                    currentIndex++;
+                    updateWheelPosition();
+                }
+            });
+
+            wheelEl.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                if (e.deltaY < 0) {
+                    if (currentIndex > 0) {
+                        currentIndex--;
+                        updateWheelPosition();
+                    }
+                } else {
+                    if (currentIndex < values.length - 1) {
+                        currentIndex++;
+                        updateWheelPosition();
+                    }
+                }
+            }, { passive: false });
+
+            let startY = 0;
+            let isDragging = false;
+            let currentDragTranslateY = 0;
+
+            const startDrag = (clientY) => {
+                isDragging = true;
+                startY = clientY;
+                currentDragTranslateY = (1 - currentIndex) * 50;
+                scrollEl.style.transition = 'none';
+            };
+
+            const moveDrag = (clientY) => {
+                if (!isDragging) return;
+                const deltaY = clientY - startY;
+                const tempY = currentDragTranslateY + deltaY;
+                
+                const minY = (1 - (values.length - 1)) * 50 - 25;
+                const maxY = 50 + 25;
+                dragY = Math.max(minY, Math.min(maxY, tempY));
+                scrollEl.style.transform = `translateY(${dragY}px)`;
+            };
+
+            const endDrag = () => {
+                if (!isDragging) return;
+                isDragging = false;
+                
+                const targetIndex = 1 - Math.round(dragY / 50);
+                currentIndex = Math.max(0, Math.min(values.length - 1, targetIndex));
+                updateWheelPosition();
+            };
+
+            wheelEl.addEventListener('mousedown', (e) => startDrag(e.clientY));
+            window.addEventListener('mousemove', (e) => moveDrag(e.clientY));
+            window.addEventListener('mouseup', endDrag);
+
+            wheelEl.addEventListener('touchstart', (e) => startDrag(e.touches[0].clientY), { passive: true });
+            wheelEl.addEventListener('touchmove', (e) => {
+                if (isDragging) {
+                    if (e.cancelable) e.preventDefault();
+                    moveDrag(e.touches[0].clientY);
+                }
+            }, { passive: false });
+            wheelEl.addEventListener('touchend', endDrag);
+
+            updateWheelPosition(false);
+        }
+
+        function buildLockWheels() {
+            const days = Array.from({length: 31}, (_, i) => i + 1);
+            const months = Array.from({length: 12}, (_, i) => i + 1);
+            const years = Array.from({length: 25}, (_, i) => 1990 + i);
+
+            setupWheel('wheel-day', days, 1);
+            setupWheel('wheel-month', months, 1);
+            setupWheel('wheel-year', years, 1998);
+        }
+
+        buildLockWheels();
 
         animate();
     </script>
