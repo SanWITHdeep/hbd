@@ -413,7 +413,7 @@
         .happy-text {
             font-family: var(--font-mea-culpa), cursive;
             font-weight: normal;
-            font-size: clamp(2.2rem, 10vw, 8.5rem);
+            font-size: clamp(3.5rem, 14vw, 13.5rem);
             line-height: 1.15;
             text-align: center;
             text-transform: none;
@@ -751,8 +751,8 @@
                 line-height: 1.5;
             }
             .happy-text {
-                font-size: clamp(3.2rem, 13vw, 5.5rem);
-                line-height: 0.95;
+                font-size: clamp(4.5rem, 18vw, 9.0rem);
+                line-height: 1.15;
             }
             .happy-text-container {
                 margin-top: 20px;
@@ -1393,7 +1393,10 @@
             document.getElementById('entry-overlay').style.opacity = '0';
             
             // Initialize music objects after user click
-            initMusic();
+            if (!bgAudioTrack) {
+                initMusic();
+            }
+            playMusicWithFade();
             
             setTimeout(() => {
                 document.getElementById('entry-overlay').style.display = 'none';
@@ -2960,6 +2963,10 @@
                 const status = document.getElementById('lock-status');
                 status.textContent = "Access Granted";
                 status.classList.add('unlocked');
+                
+                // Initialize and play background music immediately under user interaction gesture to bypass autoplay restrictions
+                initMusic();
+                playMusicWithFade();
                 
                 playUnlockSound();
                 
